@@ -1,0 +1,25 @@
+{
+    "python.pythonPath": "/mercury/data/public-cloud/projects/susecloudlaunch/bin/python",
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "python.formatting.provider": "autopep8",
+    "python.formatting.autopep8Path": "/mercury/data/public-cloud/projects/susecloudlaunch/bin/autopep8",
+    "python.formatting.autopep8Args": [
+      "--max-line-length",
+      "70",
+      "--aggressive",
+    ],
+    "python.linting.lintOnSave": true,
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.linting.pylintPath": "/mercury/data/public-cloud/projects/susecloudlaunch/bin/pylint",
+    "python.linting.pylintArgs": [
+      "--load-plugins",
+      "pylint_django", // only if you are using django framework
+      "--enable=W0614",
+      "--enable= W0611"
+    ],
+    "[python]": {
+      "editor.tabSize": 4
+    },
+  }
