@@ -1,10 +1,9 @@
 from __future__ import print_function, unicode_literals
 from PyInquirer import prompt
-from pprint import pprint
-from progress.spinner import Spinner
 from constants import *
+from awsinstance import AWSInstance
+
 import json
-import boto3
 
 
 class CloudLaunchInstance:
@@ -40,8 +39,10 @@ class CloudLaunchInstance:
         answers = prompt(questions)
 
         if answers["provider"] == "AWS":
+            # create AWS instance object
+            instance = AWSInstance("instance-1")
             # Contact AWS and get regions and azs
-            regions_zones = self.get_aws_regions_azs()
+            regions_zones = instance.get_aws_regions_azs()
             instance_type = AWS_INSTANCE_TYPES
         elif answers["provider"] == "Azure":
             pass
@@ -73,44 +74,14 @@ class CloudLaunchInstance:
                 'message': 'what type',
                 'choices': instance_type,
             },
+            {
+                'type': 'list',
+                'name': 'os',
+                'message': 'os',
+                'choices': OS_VERSIONS
+            },
         ]
         answers3 = prompt(questions3)
 
-    def get_aws_regions_azs(self):
-        """Get regions and AZs"""
-        ec2 = boto3.client('ec2')
-
-        spinner = Spinner('Talking to AWS ')
-
-        regions_az = {}
-        # Retrieves all regions/endpoints that work with EC2
-        aws_regions = ec2.describe_regions()
-
-        # Get a list of regions and then instantiate a new ec2 client for each
-        # region in order to get list of AZs for the region
-        for region in aws_regions['Regions']:
-            spinner.next()
-            my_region_name = region['RegionName']
-            ec2_region = boto3.client(
-                'ec2', region_name=my_region_name)
-            my_region = [
-                {'Name': 'region-name', 'Values': [my_region_name]}]
-            aws_azs = ec2_region.describe_availability_zones(
-                Filters=my_region)
-            for az in aws_azs['AvailabilityZones']:
-                zone = az['ZoneName']
-                regions_az.setdefault(my_region_name, set()).add(zone)
-
-        spinner.finish()
-        return regions_az
-
-    def get_aws_instance_types(self):
-        """Get instance types per region"""
-        ec2 = boto3.client('ec2')
-
-        spinner = Spinner('Talking to AWS')
-
-        instance_types = [instance_type['InstanceType']
-                          for instance_type in ec2.describe_instance_types()['InstanceTypes']]
-
-        return instance_types
+        # handle OS version logic
+        instance.get_aws_images(answers3["os"])
