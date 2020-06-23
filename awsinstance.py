@@ -6,28 +6,40 @@ import boto3
 
 class AWSInstance:
 
-    def __init__(self, name, region, zone, instance_type, imageid):
-        self._instance      = name
-        self._region        = region
-        self._zone          = zone
+    def __init__(self, name, provider, region,
+                 zone, instance_type, imageid):
+        self._instance = name
+        self._provider = provider
+        self._region = region
+        self._zone = zone
         self._instance_type = instance_type
-        self._imageid       = imageid
+        self._imageid = imageid
 
     def __str__(self):
-        return 'AWSInstance(name='+self._instance+', region='+ self._region+', zone='+self._zone+', type='+self._instance_type+', imageid='+self._imageid+ ')'
+        return 'AWSInstance(name=' + self._instance + ', provider=' + self._provider + ', region=' + self._region + ', zone=' + \
+            self._zone + ', type=' + self._instance_type + \
+            ', imageid=' + self._imageid + ')'
 
     def get_instance(self):
         """Return name of instance"""
         return self._name
 
-    def set_instance(self,name):
+    def set_instance(self, name):
         """Set name of instance"""
         self._name = name
+
+    def get_provider(self):
+        """Return name of provider"""
+        return self._provider
+
+    def set_provider(self, provider):
+        """Set name of provider"""
+        self._provider = provider
 
     def get_region(self):
         """Return name of region"""
         return self._region
-    
+
     def set_region(self, region):
         """Set region of instance"""
         self._region = region
@@ -60,7 +72,8 @@ class AWSInstance:
         """Get regions and AZs"""
         ec2 = boto3.client('ec2')
 
-        spinner = Spinner('getting regions and azs from AWS ')
+        spinner = Spinner(
+            '\033[1;32;40m getting regions and azs from AWS ')
 
         regions_az = {}
         # Retrieves all regions/endpoints that work with EC2
@@ -105,7 +118,7 @@ class AWSInstance:
         }]
 
         image_info = {}
-        spinner = Spinner('getting images from AWS ')
+        spinner = Spinner('\033[1;32;40m getting images from AWS ')
         aws_images = ec2.describe_images(Filters=filters)
         for image in aws_images['Images']:
             image_info[image['ImageId']] = {}
@@ -123,5 +136,14 @@ class AWSInstance:
 
     def get_aws_image_names(self, images):
         """Get just the aws image name into a list"""
-        print(images)
-        # print(type(images))
+        ami_list = []
+        for key, value in images.items():
+            ami_list.append(value['name'])
+        return ami_list
+
+    def get_aws_image_dict(self, images):
+        """Get just the aws image name into a list"""
+        ami_dict = {}
+        for key, value in images.items():
+            ami_dict[key] = value['name']
+        return ami_dict

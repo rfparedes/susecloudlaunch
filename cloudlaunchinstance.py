@@ -40,7 +40,14 @@ class CloudLaunchInstance:
 
         if answers["provider"] == "AWS":
             # create AWS instance object
-            instance = AWSInstance(answers["projectid"]+"-instance", "us-east-1", "us-east-1a", "small", "ami-0")
+            instance = AWSInstance(
+                answers["projectid"] +
+                "-instance",
+                "AWS",
+                "us-east-1",
+                "us-east-1a",
+                "small",
+                "ami-0")
             # Contact AWS and get regions and azs
             regions_zones = instance.get_aws_regions_azs()
             instance_type = AWS_INSTANCE_TYPES
@@ -110,20 +117,33 @@ class CloudLaunchInstance:
         # handle OS version logic
         if answers["provider"] == "AWS":
             images = instance.get_aws_images(answers4["os"])
-
+            # image_names = instance.get_aws_image_names(images)
+            image_dict = instance.get_aws_image_dict(images)
             questions5 = [
                 {
                     'type': 'list',
                     'name': 'image',
                     'message': 'what image',
-                    'choices': images,
+                    'choices': image_dict.values(),
                 },
             ]
 
-            for key,value in images.items():
-                print (key)
-                print (value['name'])
+        answers5 = prompt(questions5)
+        image_id = (
+            list(
+                image_dict.keys())[
+                list(
+                    image_dict.values()).index(
+                    answers5["image"])])
+        instance.set_ami(image_id)
 
-
-        # answers5 = prompt(questions5)
-
+        questions6 = [
+            {
+                'type': 'confirm',
+                'name': 'confirm',
+                'message': 'Create the environment now: ',
+                'default': True,
+            },
+        ]
+        answers6 = prompt(questions6)
+        print(instance)
