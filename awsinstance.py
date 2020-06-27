@@ -3,6 +3,7 @@ from constants import *
 from collections import OrderedDict
 from python_terraform import *
 import boto3
+import time
 
 
 class AWSInstance:
@@ -73,15 +74,25 @@ class AWSInstance:
         """Get regions and AZs"""
         ec2 = boto3.client('ec2')
 
-        spinner = Spinner(
-            '\033[1;32;40m getting regions and azs from AWS ')
-
         regions_az = {}
-        # Retrieves all regions/endpoints that work with EC2
-        aws_regions = ec2.describe_regions()
 
-        # Get a list of regions and then instantiate a new ec2 client for each
-        # region in order to get list of AZs for the region
+        # Cache region info if no cache or older than 7 days
+        now = time.time()
+        if (not (os.path.isfile('.awsregioncache'))):
+            # Retrieves all regions/endpoints that work with EC2
+            spinner = Spinner(
+                '\033[1;32;40m getting regions and azs from AWS ')
+            aws_regions = ec2.describe_regions()
+            with open('.awsregioncache', 'w') as fp:
+                json.dump(aws_regions, fp)
+        else:
+            spinner = Spinner(
+                '\033[1;32;40m getting regions and azs from cache ')
+            with open('.awsregioncache', 'r') as fp:
+                aws_regions = json.load(fp)
+
+        # Get a list of regions and then instantiate a new ec2 client
+        # for each region in order to get list of AZs for the region
         for region in aws_regions['Regions']:
             spinner.next()
             my_region_name = region['RegionName']
@@ -89,8 +100,18 @@ class AWSInstance:
                 'ec2', region_name=my_region_name)
             my_region = [
                 {'Name': 'region-name', 'Values': [my_region_name]}]
-            aws_azs = ec2_region.describe_availability_zones(
-                Filters=my_region)
+
+            # If AZ info is not in cache, then query AWS and cache it
+            if (not (os.path.isfile('.awsazcache'))):
+                aws_azs = ec2_region.describe_availability_zones(
+                    Filters=my_region)
+                with open('.awsazcache', 'w') as fp:
+                    json.dump(aws_azs, fp)
+            # AZ info already in cache, then load it
+            else:
+                with open('.awsazcache', 'r') as fp:
+                    aws_azs = json.load(fp)
+
             for az in aws_azs['AvailabilityZones']:
                 zone = az['ZoneName']
                 regions_az.setdefault(my_region_name, set()).add(zone)
