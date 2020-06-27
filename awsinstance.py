@@ -1,6 +1,7 @@
 from progress.spinner import Spinner
 from constants import *
 from collections import OrderedDict
+from python_terraform import *
 import boto3
 
 
@@ -22,11 +23,11 @@ class AWSInstance:
 
     def get_instance(self):
         """Return name of instance"""
-        return self._name
+        return self._instance
 
-    def set_instance(self, name):
+    def set_instance(self, instance):
         """Set name of instance"""
-        self._name = name
+        self._instance = instance
 
     def get_provider(self):
         """Return name of provider"""
@@ -110,7 +111,7 @@ class AWSInstance:
 
     def get_aws_images(self, os_version):
         """Get the images available"""
-        ec2 = boto3.client('ec2')
+        ec2 = boto3.client('ec2', self._region)
         os = "*" + os_version + '*'
         filters = [{
             'Name': 'name',
@@ -147,3 +148,39 @@ class AWSInstance:
         for key, value in images.items():
             ami_dict[key] = value['name']
         return ami_dict
+
+    def create_terraform_tfvars(self):
+        """Create the tfvars file with instance data"""
+        template = """
+        # AWS Settings
+        aws_region_1        =  "{aws_region_1}"
+        aws_zone_1          =  "{aws_zone_1}"
+        aws_profile_1       =  "default"
+        aws_key_pair_1      = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC8vQVGcwfKDT32QdWb9+PVVzAF1NVEUhOPmSbH7n8w2bIyGw7voUsEE9IdhmKr2qulnKJVRHd7XfEzBj0KJFTlkfSFEJHF/5TO4/oe4mEZkVE1H9XdnT8DsQ1Ytr+ewuRF9e5OKseQEZqPrINti4AzZ5McoS20McNNOiJCzzsn8n9NuJXBcnrBsmdj0wcJQodl3rV1v3w+rEuoosrTUqkoEn8wzySlSR3US9iYK6R/yeylVBJiPA5rCjox3SkAqsaxzfTaCNAfl5hOc+xRRU/+wIE0slro65HfwQDSJfqehJmeJ4EARInoxZabc061hVdLx2/JEIyawMvA/FDa2Qjd rich.paredes"
+        aws_instance_type_1 =  "{aws_instance_type_1}"
+        aws_ami_1           =  "{aws_ami_1}"
+
+        # AWS Network
+        private_vpc_cidr_1    = "192.168.0.0/16"
+        private_subnet_cidr_1 = "192.168.111.0/24"
+
+        # Application Definition
+        app_name_1        = "{app_name_1}"
+        app_environment_1 = "test"
+        """
+        context = {
+            "aws_region_1": self._region,
+            "aws_zone_1": self._zone,
+            "aws_instance_type_1": self._instance_type,
+            "aws_ami_1": self._imageid,
+            "app_name_1": self._instance
+        }
+        with open('tf_templates/aws/terraform.tfvars', 'w') as myfile:
+            myfile.write(template.format(**context))
+
+        tf = Terraform(
+            working_dir='/mercury/data/public-cloud/projects/susecloudlaunch/tf_templates/aws')
+        tf.init(capture_output=False)
+        tf.plan(capture_output=False)
+        tf.apply(skip_plan=True, capture_output=True)
+        tf.output()

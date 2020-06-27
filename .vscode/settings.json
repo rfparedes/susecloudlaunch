@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/mercury/data/public-cloud/projects/susecloudlaunch/bin/python",
+    "python.pythonPath": "/usr/local/opt/python/bin/python3.7",
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
     "python.formatting.provider": "autopep8",

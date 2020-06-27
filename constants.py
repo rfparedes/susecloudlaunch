@@ -2,8 +2,8 @@ AWS_INSTANCE_TYPES = [
     't2.micro',
     't3.micro',
     't3.small',
-    't3.medium',
-    't3.large']
+    'm4.large',
+    'm5.large']
 
 PROVIDERS = [
     'AWS',
@@ -34,3 +34,6 @@ OS_TYPES = [
     'sles',
     'sles for sap'
 ]
+
+TF_TEMPLATE_LOCATION = "tf_templates"
+TF_APPLY_LOCATION = "tf_apply"
