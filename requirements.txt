@@ -8,7 +8,7 @@ pycairo==1.18.2
 requests==2.19.1
 six==1.11.0
 stevedore==1.29.0
-urllib3==1.23
+urllib3==1.24.2
 virtualenv==16.0.0
 virtualenv-clone==0.3.0
 virtualenvwrapper==4.8.2
