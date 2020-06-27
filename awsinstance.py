@@ -4,6 +4,7 @@ from collections import OrderedDict
 from python_terraform import *
 import boto3
 import time
+import os
 
 
 class AWSInstance:
@@ -83,6 +84,7 @@ class AWSInstance:
             spinner = Spinner(
                 '\033[1;32;40m getting regions and azs from AWS ')
             aws_regions = ec2.describe_regions()
+            print(aws_regions)
             with open('.awsregioncache', 'w') as fp:
                 json.dump(aws_regions, fp)
         else:
@@ -100,24 +102,25 @@ class AWSInstance:
                 'ec2', region_name=my_region_name)
             my_region = [
                 {'Name': 'region-name', 'Values': [my_region_name]}]
-
             # If AZ info is not in cache, then query AWS and cache it
             if (not (os.path.isfile('.awsazcache'))):
                 aws_azs = ec2_region.describe_availability_zones(
                     Filters=my_region)
+                for az in aws_azs['AvailabilityZones']:
+                    zone = az['ZoneName']
+                    regions_az.setdefault(
+                        my_region_name, set()).add(zone)
                 with open('.awsazcache', 'w') as fp:
                     json.dump(aws_azs, fp)
+
             # AZ info already in cache, then load it
             else:
                 with open('.awsazcache', 'r') as fp:
                     aws_azs = json.load(fp)
 
-            for az in aws_azs['AvailabilityZones']:
-                zone = az['ZoneName']
-                regions_az.setdefault(my_region_name, set()).add(zone)
-
         spinner.finish()
         return regions_az
+        print(regions_az)
 
     def get_aws_instance_types(self):
         """Get instance types per region"""
@@ -196,11 +199,13 @@ class AWSInstance:
             "aws_ami_1": self._imageid,
             "app_name_1": self._instance
         }
-        with open('tf_templates/aws/terraform.tfvars', 'w') as myfile:
+        tfvars_path = os.path.join(
+            TF_APPLY_LOCATION, "aws", self._instance)
+        with open(os.path.join(tfvars_path, "terraform.tfvars"), 'w') as myfile:
             myfile.write(template.format(**context))
 
         tf = Terraform(
-            working_dir='/mercury/data/public-cloud/projects/susecloudlaunch/tf_templates/aws')
+            working_dir=tfvars_path)
         tf.init(capture_output=False)
         tf.plan(capture_output=False)
         tf.apply(skip_plan=True, capture_output=True)

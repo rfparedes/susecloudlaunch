@@ -156,7 +156,7 @@ class CloudLaunchInstance:
             allproviderutil.cp_template(
                 "aws", instance.get_instance())
 
-            # instance.create_terraform_tfvars()
+            instance.create_terraform_tfvars()
 
         # User interface when they want to destroy interface
         elif answers["purpose"] == "destroy":
