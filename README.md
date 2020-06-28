@@ -1,7 +1,7 @@
 # susecloudlaunch
 
 # Prerequisites
-1. Need the following to build instances in AWS
+- Need the following to build instances in AWS
 
     a. AWS credentials in ~/.aws/credentials of following format:
         [default]
@@ -11,3 +11,6 @@
     b. AWS default region in ~/.aws/config of following format:
         [default]
         region=us-east-1
+
+
+- Need the following to build instances in Azure
