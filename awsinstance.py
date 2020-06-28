@@ -2,6 +2,7 @@ from progress.spinner import Spinner
 from constants import *
 from collections import OrderedDict
 from python_terraform import *
+import pickle
 import boto3
 import time
 import os
@@ -75,29 +76,42 @@ class AWSInstance:
         """Get regions and AZs"""
         ec2 = boto3.client('ec2')
 
-        spinner = Spinner(
-            '\033[1;32;40m getting regions and azs from AWS ')
-
         regions_az = {}
-        # Retrieves all regions/endpoints that work with EC2
-        aws_regions = ec2.describe_regions()
 
-        # Get a list of regions and then instantiate a new ec2 client for each
-        # region in order to get list of AZs for the region
-        for region in aws_regions['Regions']:
-            spinner.next()
-            my_region_name = region['RegionName']
-            ec2_region = boto3.client(
-                'ec2', region_name=my_region_name)
-            my_region = [
-                {'Name': 'region-name', 'Values': [my_region_name]}]
-            aws_azs = ec2_region.describe_availability_zones(
-                Filters=my_region)
-            for az in aws_azs['AvailabilityZones']:
-                zone = az['ZoneName']
-                regions_az.setdefault(my_region_name, set()).add(zone)
+        if (not (os.path.isfile('.awsregionazcache'))):
 
+            spinner = Spinner(
+                '\033[1;32;40m getting regions and azs from AWS ')
+
+            # Retrieves all regions/endpoints that work with EC2
+            aws_regions = ec2.describe_regions()
+
+            # Get a list of regions and then instantiate a new ec2 client for each
+            # region in order to get list of AZs for the region
+            for region in aws_regions['Regions']:
+                spinner.next()
+                my_region_name = region['RegionName']
+                ec2_region = boto3.client(
+                    'ec2', region_name=my_region_name)
+                my_region = [
+                    {'Name': 'region-name', 'Values': [my_region_name]}]
+                aws_azs = ec2_region.describe_availability_zones(
+                    Filters=my_region)
+                for az in aws_azs['AvailabilityZones']:
+                    zone = az['ZoneName']
+                    regions_az.setdefault(
+                        my_region_name, set()).add(zone)
+            # cache the results
+            f = open(".awsregionazcache", "wb")
+            pickle.dump(regions_az, f)
+            f.close()
+        # Cached
+        else:
+            spinner = Spinner(
+                '\033[1;32;40m getting regions and azs from cache ')
+            regions_az = pickle.load(open(".awsregionazcache", "rb"))
         spinner.finish()
+
         return regions_az
 
     def get_aws_instance_types(self):
@@ -187,4 +201,5 @@ class AWSInstance:
         tf.init(capture_output=False)
         tf.plan(capture_output=False)
         tf.apply(skip_plan=True, capture_output=True)
-        tf.output()
+        my_ip = (tf.cmd("output", "ip"))
+        print("\033[1;32;40m ssh ec2-user@" + my_ip[1])

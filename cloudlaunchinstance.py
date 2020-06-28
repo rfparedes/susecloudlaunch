@@ -160,7 +160,9 @@ class CloudLaunchInstance:
 
         # User interface when they want to destroy interface
         elif answers["purpose"] == "destroy":
-            pass
+
+            allproviderutil.destroy_terraform_env(
+                (answers["provider"]).lower(), answers["projectid"])
 
         else:
             sys.exit('Neither create or destroy.  Exiting.')
