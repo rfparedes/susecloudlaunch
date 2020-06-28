@@ -3,9 +3,14 @@ Utilities for all providers
 '''
 from constants import *
 from python_terraform import *
-from progress.spinner import Spinner
 import os
 import shutil
+import threading
+import time
+
+'''
+Provider agnostic function to terraform template files to created project folder
+'''
 
 
 def cp_template(provider, projectid):
@@ -24,13 +29,38 @@ def cp_template(provider, projectid):
                 make_dir)
 
 
+'''
+Provider agnostic function to destroy a terraform environment
+'''
+
+
 def destroy_terraform_env(provider, projectid):
+    global done
     tfvars_path = os.path.join(
         TF_APPLY_LOCATION, provider, projectid)
     tf = Terraform(
         working_dir=tfvars_path)
-    spinner = Spinner(
-        '\033[1;32;40m destroying ' + projectid + ' ')
-    spinner.next()
+    done = False
+    spin_thread = threading.Thread(target=spin_cursor)
+    print('\033[1;32;40m destroying ' + projectid + ' ', end=" ")
+    spin_thread.start()
     tf.destroy(capture_output=True)
-    spinner.finish()
+    done = True
+    spin_thread.join()
+
+
+'''
+https://stackoverflow.com/questions/48854567/python-asynchronous-progress-spinner
+'''
+
+
+def spin_cursor():
+    global done
+    while True:
+        for cursor in '|/-\\':
+            sys.stdout.write(cursor)
+            sys.stdout.flush()
+            time.sleep(0.1)  # adjust this to change the speed
+            sys.stdout.write('\b')
+            if done:
+                return
