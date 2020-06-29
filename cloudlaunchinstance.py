@@ -14,19 +14,22 @@ class CloudLaunchInstance:
 
     def user_interface(self):
         """ Provide terminal user interface to get user prompts and preferences """
+
+        print(
+            '\033[1;32;40m susecloudlaunch - Launch SLE instance on AWS,Azure,GCP')
         # Ask user first set of questions
         purpose_options = ['create', 'destroy']
         questions = [
             {
                 'type': 'list',
                 'name': 'purpose',
-                'message': 'create or destroy instance',
+                'message': 'create or destroy instance & environment',
                 'choices': purpose_options,
             },
             {
                 'type': 'input',
                 'name': 'projectid',
-                'message': 'unique project name',
+                'message': 'specify unique project name',
                 'default': 'suse-repro-123',
             },
             {
