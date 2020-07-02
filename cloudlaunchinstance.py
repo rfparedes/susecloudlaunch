@@ -3,8 +3,6 @@ from PyInquirer import prompt
 from constants import *
 from awsinstance import AWSInstance
 from azureinstance import AzureInstance
-
-
 import json
 import allproviderutil
 
@@ -58,6 +56,7 @@ class CloudLaunchInstance:
                 # Contact AWS and get regions and azs
                 regions_zones = instance.get_aws_regions_azs()
                 instance_type = AWS_INSTANCE_TYPES
+                region_choices = sorted(regions_zones.keys())
 
             elif answers["provider"] == "Azure":
                 # create Azure instance object
@@ -68,7 +67,8 @@ class CloudLaunchInstance:
                     "1",
                     "Standard_B1s",
                     "ami-0")
-                regions_zones = instance.get_azure_regions_azs()
+                region_choices = instance.get_azure_regions_azs()
+                instance_type = AZURE_INSTANCE_TYPES
 
             elif answers["provider"] == "GCP":
                 pass
@@ -79,7 +79,7 @@ class CloudLaunchInstance:
                     'type': 'list',
                     'name': 'region',
                     'message': 'what region',
-                    'choices': sorted(regions_zones.keys()),
+                    'choices': region_choices,
                 }
             ]
             answers2 = prompt(questions2)

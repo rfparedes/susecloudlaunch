@@ -74,5 +74,9 @@ class AzureInstance:
         subscription = next(subscription_client.subscriptions.list())
         locations = subscription_client.subscriptions.list_locations(
             subscription.subscription_id)
+
+        regions = []
+
         for location in locations:
-            print(location.name)
+            regions.append(location.name)
+        return sorted(regions)
