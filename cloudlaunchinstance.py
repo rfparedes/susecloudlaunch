@@ -2,6 +2,8 @@ from __future__ import print_function, unicode_literals
 from PyInquirer import prompt
 from constants import *
 from awsinstance import AWSInstance
+from azureinstance import AzureInstance
+
 
 import json
 import allproviderutil
@@ -58,7 +60,15 @@ class CloudLaunchInstance:
                 instance_type = AWS_INSTANCE_TYPES
 
             elif answers["provider"] == "Azure":
-                pass
+                # create Azure instance object
+                instance = AzureInstance(
+                    answers["projectid"],
+                    "Azure",
+                    "eastus",
+                    "1",
+                    "Standard_B1s",
+                    "ami-0")
+                regions_zones = instance.get_azure_regions_azs()
 
             elif answers["provider"] == "GCP":
                 pass

@@ -1,3 +1,8 @@
+from constants import *
+from azure.common.client_factory import get_client_from_cli_profile
+from azure.mgmt.subscription import SubscriptionClient
+
+
 class AzureInstance:
 
     def __init__(self, name, provider, region,
@@ -61,3 +66,13 @@ class AzureInstance:
     def set_ami(self, imageid):
         """Set ami id of instance"""
         self._imageid = imageid
+
+    def get_azure_regions_azs(self):
+        subscription_client = get_client_from_cli_profile(
+            SubscriptionClient)
+
+        subscription = next(subscription_client.subscriptions.list())
+        locations = subscription_client.subscriptions.list_locations(
+            subscription.subscription_id)
+        for location in locations:
+            print(location.name)
