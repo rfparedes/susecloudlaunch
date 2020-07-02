@@ -1,3 +1,5 @@
+AZURE_AUTH_LOCATION = "/mercury/data/public-cloud/keys/azure/credentials.json"
+
 AWS_INSTANCE_TYPES = [
     't3.micro',
     't3.small',
@@ -6,7 +8,7 @@ AWS_INSTANCE_TYPES = [
 
 PROVIDERS = [
     'AWS',
-    'AZURE',
+    'Azure',
     'GCP']
 
 SLES_VERSIONS = [

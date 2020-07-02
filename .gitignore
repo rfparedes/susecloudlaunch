@@ -5,3 +5,4 @@ __pycache__
 tf_apply/aws/*
 tf_apply/gcp/*
 tf_apply/azure/*
+local-sp.json
