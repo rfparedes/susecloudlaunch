@@ -70,13 +70,10 @@ class AzureInstance:
     def get_azure_regions_azs(self):
         subscription_client = get_client_from_cli_profile(
             SubscriptionClient)
-
         subscription = next(subscription_client.subscriptions.list())
         locations = subscription_client.subscriptions.list_locations(
             subscription.subscription_id)
-
         regions = []
-
         for location in locations:
             regions.append(location.name)
         return sorted(regions)

@@ -92,7 +92,7 @@ class CloudLaunchInstance:
             answers2 = prompt(questions2)
             instance.set_region(answers2['region'])
             # Ask for a zone based on region
-            if answers["provider"] == "AWS":
+            if answers["provider"] == "aws":
                 questions3 = [
                     {
                         'type': 'list',
@@ -101,7 +101,7 @@ class CloudLaunchInstance:
                         'choices': sorted(regions_zones[answers2["region"]]),
                     },
                 ]
-            elif answers["provider"] == "Azure":
+            elif answers["provider"] == "azure":
                 questions3 = [
                     {
                         'type': 'list',
@@ -152,7 +152,7 @@ class CloudLaunchInstance:
             answers4 = prompt(questions4)
 
             # handle OS version logic
-            if answers["provider"] == "AWS":
+            if answers["provider"] == "aws":
                 images = instance.get_aws_images(answers4["os"])
                 # image_names = instance.get_aws_image_names(images)
                 image_dict = instance.get_aws_image_dict(images)
