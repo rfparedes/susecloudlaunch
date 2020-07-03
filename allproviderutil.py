@@ -8,6 +8,7 @@ import shutil
 import threading
 import time
 
+
 '''
 Provider agnostic function to terraform template files to created project folder
 '''
@@ -30,6 +31,19 @@ def cp_template(provider, projectid):
 
 
 '''
+Get directory names from tf_apply to provide to user when selecting which project to destroy
+'''
+
+
+def get_terraform_project_dirs(provider):
+    #project_names = []
+    tfvars_path = os.path.join(
+        TF_APPLY_LOCATION, provider)
+    project_names = os.listdir(tfvars_path)
+    return project_names
+
+
+'''
 Provider agnostic function to destroy a terraform environment
 '''
 
@@ -47,6 +61,8 @@ def destroy_terraform_env(provider, projectid):
     tf.destroy(capture_output=True)
     done = True
     spin_thread.join()
+    # cleanup by deleting the directory
+    shutil.rmtree(tfvars_path)
 
 
 '''

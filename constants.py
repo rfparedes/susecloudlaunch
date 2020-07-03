@@ -11,9 +11,9 @@ AZURE_INSTANCE_TYPES = [
     'B2ms']
 
 PROVIDERS = [
-    'AWS',
-    'Azure',
-    'GCP']
+    'aws',
+    'azure',
+    'gcp']
 
 SLES_VERSIONS = [
     'sles-12-sp1',

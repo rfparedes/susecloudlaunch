@@ -5,6 +5,7 @@ from awsinstance import AWSInstance
 from azureinstance import AzureInstance
 import json
 import allproviderutil
+import sys
 
 
 class CloudLaunchInstance:
@@ -27,12 +28,6 @@ class CloudLaunchInstance:
                 'choices': purpose_options,
             },
             {
-                'type': 'input',
-                'name': 'projectid',
-                'message': 'specify unique project name',
-                'default': 'suse-repro-123',
-            },
-            {
                 'type': 'list',
                 'name': 'provider',
                 'message': 'on what provider',
@@ -44,10 +39,21 @@ class CloudLaunchInstance:
 
         # User interface when they want to create an instance
         if answers["purpose"] == "create":
-            if answers["provider"] == "AWS":
+
+            projectid_creation = [
+                {
+                    'type': 'input',
+                    'name': 'projectid',
+                    'message': 'specify unique project name',
+                    'default': 'suse-repro-123',
+                },
+            ]
+            projectid_answer = prompt(projectid_creation)
+
+            if answers["provider"] == "aws":
                 # create AWS instance object
                 instance = AWSInstance(
-                    answers["projectid"],
+                    projectid_answer["projectid"],
                     "AWS",
                     "us-east-1",
                     "us-east-1a",
@@ -58,10 +64,10 @@ class CloudLaunchInstance:
                 instance_type = AWS_INSTANCE_TYPES
                 region_choices = sorted(regions_zones.keys())
 
-            elif answers["provider"] == "Azure":
+            elif answers["provider"] == "azure":
                 # create Azure instance object
                 instance = AzureInstance(
-                    answers["projectid"],
+                    projectid_answer["projectid"],
                     "Azure",
                     "eastus",
                     "1",
@@ -71,7 +77,7 @@ class CloudLaunchInstance:
                 instance_type = AZURE_INSTANCE_TYPES
                 regions_zones = 1
 
-            elif answers["provider"] == "GCP":
+            elif answers["provider"] == "gcp":
                 pass
 
             # Ask for a region based on provider
@@ -188,8 +194,28 @@ class CloudLaunchInstance:
         # User interface when they want to destroy interface
         elif answers["purpose"] == "destroy":
 
-            allproviderutil.destroy_terraform_env(
-                (answers["provider"]).lower(), answers["projectid"])
+            # Get current projects that can be destroyed
+            project_names = allproviderutil.get_terraform_project_dirs(
+                answers["provider"])
+
+            # No projects ever created so exit
+            if not project_names:
+                sys.exit(
+                    '\033[1;32;40m No projects to destroy. Exiting')
+            else:
+                projectid_select = [
+                    {
+                        'type': 'list',
+                        'name': 'projectid_destroy',
+                        'message': 'what project to destroy',
+                        'choices': project_names,
+                    },
+                ]
+
+                projectid_destroy_answer = prompt(projectid_select)
+
+                allproviderutil.destroy_terraform_env(
+                    (answers["provider"]), projectid_destroy_answer["projectid_destroy"])
 
         else:
             sys.exit('Neither create or destroy.  Exiting.')
