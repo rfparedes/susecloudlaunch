@@ -69,6 +69,7 @@ class CloudLaunchInstance:
                     "ami-0")
                 region_choices = instance.get_azure_regions_azs()
                 instance_type = AZURE_INSTANCE_TYPES
+                regions_zones = 1
 
             elif answers["provider"] == "GCP":
                 pass
@@ -85,13 +86,25 @@ class CloudLaunchInstance:
             answers2 = prompt(questions2)
             instance.set_region(answers2['region'])
             # Ask for a zone based on region
-            questions3 = [
-                {
-                    'type': 'list',
-                    'name': 'zone',
-                    'message': 'what zone',
-                    'choices': sorted(regions_zones[answers2["region"]]),
-                },
+            if answers["provider"] == "AWS":
+                questions3 = [
+                    {
+                        'type': 'list',
+                        'name': 'zone',
+                        'message': 'what zone',
+                        'choices': sorted(regions_zones[answers2["region"]]),
+                    },
+                ]
+            elif answers["provider"] == "Azure":
+                questions3 = [
+                    {
+                        'type': 'list',
+                        'name': 'zone',
+                        'message': 'what zone',
+                        'choices': '1',
+                    },
+                ]
+            questions3b = [
                 {
                     'type': 'list',
                     'name': 'instance_type',
@@ -107,10 +120,11 @@ class CloudLaunchInstance:
             ]
 
             answers3 = prompt(questions3)
+            answers3b = prompt(questions3b)
             instance.set_zone(answers3['zone'])
-            instance.set_instance_type(answers3['instance_type'])
+            instance.set_instance_type(answers3b['instance_type'])
 
-            if answers3["sles_or_sap"] == "sles":
+            if answers3b["sles_or_sap"] == "sles":
                 questions4 = [
                     {
                         'type': 'list',
@@ -120,7 +134,7 @@ class CloudLaunchInstance:
                     },
                 ]
 
-            elif answers3["sles_or_sap"] == "sles for sap":
+            elif answers3b["sles_or_sap"] == "sles for sap":
                 questions4 = [
                     {
                         'type': 'list',

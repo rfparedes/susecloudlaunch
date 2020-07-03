@@ -3,8 +3,12 @@ AZURE_AUTH_LOCATION = "/mercury/data/public-cloud/keys/azure/credentials.json"
 AWS_INSTANCE_TYPES = [
     't3.micro',
     't3.small',
-    'm4.large',
-    'm5.large']
+    'm4.large']
+
+AZURE_INSTANCE_TYPES = [
+    'B1s',
+    'B1ms',
+    'B2ms']
 
 PROVIDERS = [
     'AWS',
