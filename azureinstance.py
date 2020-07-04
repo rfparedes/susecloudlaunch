@@ -79,12 +79,14 @@ class AzureInstance:
             regions.append(location.name)
         return sorted(regions)
 
-    def get_azure_images(self, region):
+    def get_azure_images(self, os_version):
 
         publisher = "SUSE"
+        region = self.get_region()
         compute_client = get_client_from_cli_profile(
             ComputeManagementClient)
 
+        list_of_images = []
         result_list_offers = compute_client.virtual_machine_images.list_offers(region, publisher,
                                                                                )
         for offer in result_list_offers:
@@ -110,10 +112,11 @@ class AzureInstance:
                         sku.name,
                         version.name,
                     )
-
-                    print('PUBLISHER: {0}, OFFER: {1}, SKU: {2}, VERSION: {3}'.format(
-                        publisher,
-                        offer.name,
-                        sku.name,
-                        version.name,
-                    ))
+                    if os_version in offer.name:
+                        urn = (
+                            publisher + ":" +
+                            offer.name + ":" +
+                            sku.name + ":" +
+                            version.name)
+                        list_of_images.append(urn)
+        return(list_of_images)
