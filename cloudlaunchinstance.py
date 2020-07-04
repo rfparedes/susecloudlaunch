@@ -59,6 +59,7 @@ class CloudLaunchInstance:
                     "us-east-1a",
                     "small",
                     "ami-0")
+                instance.set_provider("aws")
                 # Contact AWS and get regions and azs
                 regions_zones = instance.get_aws_regions_azs()
                 instance_type = AWS_INSTANCE_TYPES
@@ -73,6 +74,7 @@ class CloudLaunchInstance:
                     "1",
                     "Standard_B1s",
                     "ami-0")
+                instance.set_provider("azure")
                 region_choices = instance.get_azure_regions_azs()
                 instance_type = AZURE_INSTANCE_TYPES
                 regions_zones = 1
@@ -207,9 +209,10 @@ class CloudLaunchInstance:
             if (answers6["confirm"]) == True:
                 # Prepare tf apply directory
                 allproviderutil.cp_template(
-                    "aws", instance.get_instance())
+                    instance.get_provider(), instance.get_instance())
 
-                instance.create_terraform_tfvars()
+                allproviderutil.create_terraform_tfvars(
+                    instance.get_provider(), instance.get_region(), instance.get_zone(), instance.get_instance_type(), instance.get_image(), instance.get_instance())
             else:
                 sys.exit("\033[1;32;40m Exiting")
 

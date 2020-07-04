@@ -69,6 +69,7 @@ class AzureInstance:
         self._imageid = imageid
 
     def get_azure_regions_azs(self):
+        """Get regions via Azure SDK"""
         subscription_client = get_client_from_cli_profile(
             SubscriptionClient)
         subscription = next(subscription_client.subscriptions.list())
@@ -80,22 +81,21 @@ class AzureInstance:
         return sorted(regions)
 
     def get_azure_images(self, os_version):
-
+        """Get images via Azure SDK"""
         publisher = "SUSE"
         region = self.get_region()
         compute_client = get_client_from_cli_profile(
             ComputeManagementClient)
 
         list_of_images = []
-        result_list_offers = compute_client.virtual_machine_images.list_offers(region, publisher,
-                                                                               )
+        result_list_offers = compute_client.virtual_machine_images.list_offers(
+            region, publisher,)
         for offer in result_list_offers:
             result_list_skus = compute_client.virtual_machine_images.list_skus(
                 region,
                 publisher,
                 offer.name,
             )
-
             for sku in result_list_skus:
                 result_list = compute_client.virtual_machine_images.list(
                     region,
@@ -103,7 +103,6 @@ class AzureInstance:
                     offer.name,
                     sku.name,
                 )
-
                 for version in result_list:
                     result_get = compute_client.virtual_machine_images.get(
                         region,
