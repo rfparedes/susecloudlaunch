@@ -1,6 +1,7 @@
 from constants import *
 from azure.common.client_factory import get_client_from_cli_profile
 from azure.mgmt.subscription import SubscriptionClient
+from azure.mgmt.compute import ComputeManagementClient
 
 
 class AzureInstance:
@@ -77,3 +78,42 @@ class AzureInstance:
         for location in locations:
             regions.append(location.name)
         return sorted(regions)
+
+    def get_azure_images(self, region):
+
+        publisher = "SUSE"
+        compute_client = get_client_from_cli_profile(
+            ComputeManagementClient)
+
+        result_list_offers = compute_client.virtual_machine_images.list_offers(region, publisher,
+                                                                               )
+        for offer in result_list_offers:
+            result_list_skus = compute_client.virtual_machine_images.list_skus(
+                region,
+                publisher,
+                offer.name,
+            )
+
+            for sku in result_list_skus:
+                result_list = compute_client.virtual_machine_images.list(
+                    region,
+                    publisher,
+                    offer.name,
+                    sku.name,
+                )
+
+                for version in result_list:
+                    result_get = compute_client.virtual_machine_images.get(
+                        region,
+                        publisher,
+                        offer.name,
+                        sku.name,
+                        version.name,
+                    )
+
+                    print('PUBLISHER: {0}, OFFER: {1}, SKU: {2}, VERSION: {3}'.format(
+                        publisher,
+                        offer.name,
+                        sku.name,
+                        version.name,
+                    ))

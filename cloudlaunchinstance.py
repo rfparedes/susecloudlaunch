@@ -165,6 +165,9 @@ class CloudLaunchInstance:
                     },
                 ]
 
+            elif answers["provider"] == "azure":
+                instance.get_azure_images("eastus")
+
             answers5 = prompt(questions5)
             image_id = (
                 list(
