@@ -156,6 +156,10 @@ class CloudLaunchInstance:
                 images = instance.get_aws_images(answers4["os"])
                 # image_names = instance.get_aws_image_names(images)
                 image_dict = instance.get_aws_image_dict(images)
+                # Exit if no images
+                if not image_dict:
+                    sys.exit(
+                        "\033[1;32;40m No AWS images for this OS. Exiting")
                 questions5 = [
                     {
                         'type': 'list',
@@ -164,10 +168,22 @@ class CloudLaunchInstance:
                         'choices': image_dict.values(),
                     },
                 ]
+                answers5 = prompt(questions5)
+                image_id = (
+                    list(
+                        image_dict.keys())[
+                        list(
+                            image_dict.values()).index(
+                            answers5["image"])])
+                instance.set_ami(image_id)
 
             elif answers["provider"] == "azure":
                 images = instance.get_azure_images(
                     answers4["os"])
+                # Exit if no images
+                if not images:
+                    sys.exit(
+                        "\033[1;32;40m No Azure images for this OS. Exiting")
                 questions5 = [
                     {
                         'type': 'list',
@@ -176,16 +192,8 @@ class CloudLaunchInstance:
                         'choices': images,
                     },
                 ]
-
-            answers5 = prompt(questions5)
-            image_id = (
-                list(
-                    image_dict.keys())[
-                    list(
-                        image_dict.values()).index(
-                        answers5["image"])])
-            print(image_id)
-            instance.set_ami(image_id)
+                answers5 = prompt(questions5)
+                instance.set_ami(answers5["image"])
 
             questions6 = [
                 {
@@ -196,12 +204,14 @@ class CloudLaunchInstance:
                 },
             ]
             answers6 = prompt(questions6)
+            if (answers6["confirm"]) == True:
+                # Prepare tf apply directory
+                allproviderutil.cp_template(
+                    "aws", instance.get_instance())
 
-            # Prepare tf apply directory
-            allproviderutil.cp_template(
-                "aws", instance.get_instance())
-
-            instance.create_terraform_tfvars()
+                instance.create_terraform_tfvars()
+            else:
+                sys.exit("\033[1;32;40m Exiting")
 
         # User interface when they want to destroy interface
         elif answers["purpose"] == "destroy":

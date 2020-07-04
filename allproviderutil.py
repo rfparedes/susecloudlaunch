@@ -36,7 +36,7 @@ Get directory names from tf_apply to provide to user when selecting which projec
 
 
 def get_terraform_project_dirs(provider):
-    #project_names = []
+    # project_names = []
     tfvars_path = os.path.join(
         TF_APPLY_LOCATION, provider)
     project_names = os.listdir(tfvars_path)
