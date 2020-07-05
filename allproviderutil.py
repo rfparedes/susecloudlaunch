@@ -68,6 +68,8 @@ def destroy_terraform_env(provider, projectid):
 def create_terraform_tfvars(
         provider, region, zone, instance_type, imageid, instance):
 
+    # TODO : for key pairs, use the ~/.ssh/id_rsa.pub as the default
+    # keypair so whatever use is running this program
     if provider == "aws":
         """Create the tfvars file with instance data"""
         template = """
