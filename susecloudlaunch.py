@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from cloudlaunchinstance import CloudLaunchInstance
 import os
 

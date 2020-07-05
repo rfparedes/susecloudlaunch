@@ -3,6 +3,7 @@ Utilities for all providers
 '''
 from constants import *
 from python_terraform import *
+from pathlib import *
 import os
 import shutil
 import threading
@@ -46,7 +47,8 @@ def get_terraform_project_dirs(provider):
 '''
 Provider agnostic function to destroy a terraform environment
 '''
-
+# TODO : make this function asynchronous? 
+# TODO : need to show output
 
 def destroy_terraform_env(provider, projectid):
     global done
@@ -71,6 +73,7 @@ def create_terraform_tfvars(
     # TODO : for key pairs, use the ~/.ssh/id_rsa.pub as the default
     # keypair so whatever use is running this program
     if provider == "aws":
+        username = "ec2-user"
         """Create the tfvars file with instance data"""
         template = """
         # AWS Settings
@@ -96,18 +99,56 @@ def create_terraform_tfvars(
             "aws_ami_1": imageid,
             "app_name_1": instance
         }
-        tfvars_path = os.path.join(
-            TF_APPLY_LOCATION, "aws", instance)
-        with open(os.path.join(tfvars_path, "terraform.tfvars"), 'w') as myfile:
-            myfile.write(template.format(**context))
 
-        tf = Terraform(
-            working_dir=tfvars_path)
-        tf.init(capture_output=False)
-        tf.plan(capture_output=False)
-        tf.apply(skip_plan=True, capture_output=True)
-        my_ip = (tf.cmd("output", "ip"))
-        print("\033[1;32;40m ssh ec2-user@" + my_ip[1])
+    elif provider == "azure":
+        username = "azureuser"
+        """Create tfvars file with instance data"""
+        template = """
+        # Azure Settings
+        azure_region_1        = "{azure_region_1}"
+        azure_key_pair_1      = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC8vQVGcwfKDT32QdWb9+PVVzAF1NVEUhOPmSbH7n8w2bIyGw7voUsEE9IdhmKr2qulnKJVRHd7XfEzBj0KJFTlkfSFEJHF/5TO4/oe4mEZkVE1H9XdnT8DsQ1Ytr+ewuRF9e5OKseQEZqPrINti4AzZ5McoS20McNNOiJCzzsn8n9NuJXBcnrBsmdj0wcJQodl3rV1v3w+rEuoosrTUqkoEn8wzySlSR3US9iYK6R/yeylVBJiPA5rCjox3SkAqsaxzfTaCNAfl5hOc+xRRU/+wIE0slro65HfwQDSJfqehJmeJ4EARInoxZabc061hVdLx2/JEIyawMvA/FDa2Qjd rich.paredes"
+        azure_instance_type_1 = "Standard_{azure_instance_type_1}"
+        azure_image_offer     = "{azure_image_offer}"
+        azure_image_sku       = "{azure_image_sku}"
+        azure_image_version   = "{azure_image_version}"
+
+        private_vpc_cidr_1    = "{private_vpc_cidr_1}"
+        private_subnet_cidr_1 = "{private_subnet_cidr_1}"
+
+
+        # Application Definition
+        app_name_1        = "{app_name_1}"
+        """
+        # Get ssh public key of current logged in user
+        pubkey_path = str(Path.home()) + "/.ssh/id_rsa.pub"
+        f = open(pubkey_path, "r")
+        ssh_key = f.read()
+        # Split the uri image into individual
+        # publisher/offer/sku/version
+        context = {
+            "azure_region_1": region,
+            "azure_instance_type_1": instance_type,
+            "azure_image_offer": imageid.split(':')[1],
+            "azure_image_sku": imageid.split(':')[2],
+            "azure_image_version": imageid.split(':')[3],
+            "app_name_1": instance,
+            "private_vpc_cidr_1": PRIVATE_VPC_CIDR_1,
+            "private_subnet_cidr_1": PRIVATE_SUBNET_CIDR_1
+        }
+
+    tfvars_path = os.path.join(
+        TF_APPLY_LOCATION, provider, instance)
+    with open(os.path.join(tfvars_path, "terraform.tfvars"), 'w') as myfile:
+        myfile.write(template.format(**context))
+
+    tf = Terraform(
+        working_dir=tfvars_path)
+    tf.init(capture_output=False)
+    tf.plan(capture_output=False)
+    tf.apply(skip_plan=True, capture_output=True)
+    my_ip = (tf.cmd("output", "ip"))
+    print (my_ip)
+    print("\033[1;32;40m ssh " + username + "@" + my_ip[1])
 
 
 '''

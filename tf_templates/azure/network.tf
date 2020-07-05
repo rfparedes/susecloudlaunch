@@ -10,7 +10,7 @@ resource "azurerm_resource_group" "scl_resource_group" {
 # create Virtual Network
 resource "azurerm_virtual_network" "scl_network" {
   name                = "${var.app_name_1}-vnet"
-  cidr_block          = ["${var.private_vpc_cidr_1}"]
+  address_space       = ["${var.private_vpc_cidr_1}"]
   location            = var.azure_region_1
   resource_group_name = azurerm_resource_group.scl_resource_group.name
   tags = {
@@ -23,7 +23,7 @@ resource "azurerm_subnet" "scl_subnet" {
   name                 = "${var.app_name_1}-subnet"
   resource_group_name  = azurerm_resource_group.scl_resource_group.name
   virtual_network_name = azurerm_virtual_network.scl_network.name
-  address_prefixes     = ["${var.private_subnet_cidr_1}"]
+  address_prefix       = var.private_subnet_cidr_1
 }
 
 # create public IP address
@@ -105,7 +105,3 @@ resource "azurerm_storage_account" "scl_sa" {
   }
 }
 
-
-output "ip" {
-  value = azurerm_public_ip.scl_publicip
-}
