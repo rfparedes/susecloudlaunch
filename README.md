@@ -14,3 +14,9 @@
 
 
 - Need the following to build instances in Azure
+    a. az login
+
+- Need the following to build instances in GCP
+    a. gcloud auth login
+    b. gcloud auth application-default login
+    b. enabled Cloud Resource Manager API

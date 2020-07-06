@@ -3,6 +3,7 @@ from PyInquirer import prompt
 from constants import *
 from awsinstance import AWSInstance
 from azureinstance import AzureInstance
+from gcpinstance import GCPInstance
 import json
 import allproviderutil
 import sys
@@ -40,6 +41,7 @@ class CloudLaunchInstance:
         # User interface when they want to create an instance
         if answers["purpose"] == "create":
 
+            # TODO: Minimum 6 character project name
             projectid_creation = [
                 {
                     'type': 'input',
@@ -54,12 +56,11 @@ class CloudLaunchInstance:
                 # create AWS instance object
                 instance = AWSInstance(
                     projectid_answer["projectid"],
-                    "AWS",
+                    "aws",
                     "us-east-1",
                     "us-east-1a",
-                    "small",
+                    "t3.micro",
                     "ami-0")
-                instance.set_provider("aws")
                 # Contact AWS and get regions and azs
                 regions_zones = instance.get_aws_regions_azs()
                 instance_type = AWS_INSTANCE_TYPES
@@ -69,18 +70,31 @@ class CloudLaunchInstance:
                 # create Azure instance object
                 instance = AzureInstance(
                     projectid_answer["projectid"],
-                    "Azure",
+                    "azure",
                     "eastus",
                     "1",
                     "Standard_B1s",
                     "ami-0")
-                instance.set_provider("azure")
                 region_choices = instance.get_azure_regions_azs()
                 instance_type = AZURE_INSTANCE_TYPES
                 regions_zones = 1
 
             elif answers["provider"] == "gcp":
-                pass
+                # create GCP instance object
+                instance = GCPInstance(
+                    projectid_answer["projectid"],
+                    "gcp",
+                    "us-east1",
+                    "us-east1-b",
+                    "f1.micro",
+                    "ami-0")
+                # Create GCP project
+                instance.create_gcp_project(
+                    projectid_answer["projectid"])
+                # TODO : Add code to get GCP regions and zones
+                sys.exit()
+            else:
+                sys.exit("No provider selected")
 
             # Ask for a region based on provider
             questions2 = [
