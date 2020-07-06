@@ -6,3 +6,6 @@ tf_apply/aws/*
 tf_apply/gcp/*
 tf_apply/azure/*
 local-sp.json
+.vscode
+@eaDir
+.awsregionazcache
