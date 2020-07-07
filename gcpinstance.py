@@ -1,9 +1,7 @@
-from oauth2client.client import GoogleCredentials
 from constants import *
-from libcloud.compute.types import Provider
-from libcloud.compute.providers import get_driver
 from google.cloud import resource_manager
 from googleapiclient import discovery
+from oauth2client.client import GoogleCredentials
 from pprint import pprint
 
 
@@ -77,39 +75,57 @@ class GCPInstance:
         new_project.create()
 
     def get_gcp_regions(self):
-        """Get GCP available regions"""
-        ComputeEngine = get_driver(Provider.GCE)
-        # TODO: dynamically get client_id and client_secret from
-        # ~/.config/gcloud/application_default_credentials.json
-        driver = ComputeEngine(
-            '764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com',
-            'd-FL95Q19q7MQmFpd7hHD0Ty',
-            project=self.get_instance(),
-            datacenter='us-east1-b')
+        """Get GCP available regions and zones in one API call"""
         regions = []
-        for region in driver.ex_list_regions():
-            regions.append(region.name)
-        return regions
+        zones = []
+        credentials = GoogleCredentials.get_application_default()
+        service = discovery.build(
+            'compute', 'v1', credentials=credentials)
+        project = self.get_instance()
+        request = service.regions().list(project=project)
+        while request is not None:
+            response = request.execute()
 
-    def get_gcp_zones(self, region):
-        """Get GCP Zones for a region"""
-        ComputeEngine = get_driver(Provider.GCE)
-        driver = ComputeEngine(
-            '764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com',
-            'd-FL95Q19q7MQmFpd7hHD0Ty',
-            project=self.get_instance(),
-            datacenter='us-east1-b')
+            for region in response['items']:
+                regions.append(region['name'])
+                for zone in region['zones']:
+                    zones.append(zone.rsplit('/', 1)[-1])
+            request = service.regions().list_next(
+                previous_request=request, previous_response=response)
+        return regions, zones
+
+    def get_gcp_zones(self, region, zones):
+        """Get GCP Zones for a region for zones already received from region call"""
         region_zones = []
-        for zone in driver.ex_list_zones():
-            if region in zone.name:
-                region_zones.append(zone.name)
+        for zone in zones:
+            if region in zone:
+                region_zones.append(zone)
         return region_zones
 
-    def get_gcp_images(self):
-        ComputeEngine = get_driver(Provider.GCE)
-        driver = ComputeEngine(
-            '764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com',
-            'd-FL95Q19q7MQmFpd7hHD0Ty',
-            project=self.get_instance(),
-            datacenter='us-east1-b')
-        print(driver.list_images())
+    def get_gcp_images(self, sles_or_sap, os):
+        """Get GCP Images"""
+        """GCP has PROJECT and FAMILY"""
+        """PROJECT suse-cloud is for SLES with FAMILY, sles-12 and sles15"""
+        """PROJECT suse-sap-cloud is for SLE-SAP with FAMILY, sles-12-sp2-sap, sles-12-sp3-sap, sles-12-sp4-sap, sles-12-sp5-sap, sles-15-sap, sles-15-sp1-sap"""
+        """can use list with project suse-cloud and filter name=sles-12-sp5*"""
+        credentials = GoogleCredentials.get_application_default()
+        service = discovery.build(
+            'compute', 'v1', credentials=credentials)
+        gcp_images = []
+        if sles_or_sap == "sles":
+            project = "suse-cloud"
+        elif sles_or_sap == "sles-sap":
+            project = "suse-sap-cloud"
+        else:
+            sys.exit("Error. No GCP image project.")
+
+        filter = "name=" + os + "*"
+        request = service.images().list(project=project, filter=filter)
+        while request is not None:
+            response = request.execute()
+
+            for image in response['items']:
+                gcp_images.append(image['name'])
+        request = service.images().list_next(
+            previous_request=request, previous_response=response)
+        print(gcp_images)

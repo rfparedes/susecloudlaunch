@@ -92,9 +92,8 @@ class CloudLaunchInstance:
                 # instance.create_gcp_project(
                 #    projectid_answer["projectid"])
                 # TODO : Add code to get GCP regions and zones
-                region_choices = instance.get_gcp_regions()
+                region_choices, gcp_zones = instance.get_gcp_regions()
                 instance_type = GCP_INSTANCE_TYPES
-                instance.get_gcp_images()
 
             else:
                 sys.exit("No provider selected")
@@ -130,12 +129,14 @@ class CloudLaunchInstance:
                     },
                 ]
             elif answers["provider"] == "gcp":
+                zone_choices = instance.get_gcp_zones(
+                    answers2["region"], gcp_zones)
                 questions3 = [
                     {
                         'type': 'list',
                         'name': 'zone',
                         'message': 'what zone',
-                        'choices': instance.get_gcp_zones(answers2['region']),
+                        'choices': zone_choices,
                     },
                 ]
             questions3b = [
@@ -148,7 +149,7 @@ class CloudLaunchInstance:
                 {
                     'type': 'list',
                     'name': 'sles_or_sap',
-                    'message': 'sles or sles for sap',
+                    'message': 'sles or sles-sap',
                     'choices': OS_TYPES,
                 },
             ]
@@ -168,7 +169,7 @@ class CloudLaunchInstance:
                     },
                 ]
 
-            elif answers3b["sles_or_sap"] == "sles for sap":
+            elif answers3b["sles_or_sap"] == "sles-sap":
                 questions4 = [
                     {
                         'type': 'list',
@@ -222,6 +223,9 @@ class CloudLaunchInstance:
                 ]
                 answers5 = prompt(questions5)
                 instance.set_ami(answers5["image"])
+            elif answers["provider"] == "gcp":
+                images = instance.get_gcp_images(
+                    answers3b["sles_or_sap"], answers4["os"])
 
             questions6 = [
                 {

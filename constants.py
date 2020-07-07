@@ -43,7 +43,7 @@ SLES_SAP_VERSIONS = [
 
 OS_TYPES = [
     'sles',
-    'sles for sap'
+    'sles-sap'
 ]
 
 TF_TEMPLATE_LOCATION = "tf_templates"
