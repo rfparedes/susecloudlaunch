@@ -1,7 +1,10 @@
+from oauth2client.client import GoogleCredentials
 from constants import *
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
 from google.cloud import resource_manager
+from googleapiclient import discovery
+from pprint import pprint
 
 
 class GCPInstance:
@@ -75,3 +78,38 @@ class GCPInstance:
 
     def get_gcp_regions(self):
         """Get GCP available regions"""
+        ComputeEngine = get_driver(Provider.GCE)
+        # TODO: dynamically get client_id and client_secret from
+        # ~/.config/gcloud/application_default_credentials.json
+        driver = ComputeEngine(
+            '764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com',
+            'd-FL95Q19q7MQmFpd7hHD0Ty',
+            project=self.get_instance(),
+            datacenter='us-east1-b')
+        regions = []
+        for region in driver.ex_list_regions():
+            regions.append(region.name)
+        return regions
+
+    def get_gcp_zones(self, region):
+        """Get GCP Zones for a region"""
+        ComputeEngine = get_driver(Provider.GCE)
+        driver = ComputeEngine(
+            '764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com',
+            'd-FL95Q19q7MQmFpd7hHD0Ty',
+            project=self.get_instance(),
+            datacenter='us-east1-b')
+        region_zones = []
+        for zone in driver.ex_list_zones():
+            if region in zone.name:
+                region_zones.append(zone.name)
+        return region_zones
+
+    def get_gcp_images(self):
+        ComputeEngine = get_driver(Provider.GCE)
+        driver = ComputeEngine(
+            '764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com',
+            'd-FL95Q19q7MQmFpd7hHD0Ty',
+            project=self.get_instance(),
+            datacenter='us-east1-b')
+        print(driver.list_images())

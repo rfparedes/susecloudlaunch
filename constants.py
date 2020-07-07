@@ -10,6 +10,12 @@ AZURE_INSTANCE_TYPES = [
     'B1ms',
     'B2ms']
 
+GCP_INSTANCE_TYPES = [
+    'f1.micro',
+    'n1-standard-1',
+    'n1-standard-2'
+]
+
 PROVIDERS = [
     'aws',
     'azure',

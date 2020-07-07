@@ -111,7 +111,10 @@ class AzureInstance:
                         sku.name,
                         version.name,
                     )
-                    if os_version in offer.name:
+                    #print(offer.name + "::" + sku.name)
+                    # TODO: Fix this, this is not correct. Need to
+                    # pull the images from multiple levels
+                    if os_version in offer.name or "SLES-SAP" in offer.name:
                         urn = (
                             publisher + ":" +
                             offer.name + ":" +

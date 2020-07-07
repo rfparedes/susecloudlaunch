@@ -47,7 +47,7 @@ class CloudLaunchInstance:
                     'type': 'input',
                     'name': 'projectid',
                     'message': 'specify unique project name',
-                    'default': 'suse-repro-123',
+                    'default': 'suse-repro2',
                 },
             ]
             projectid_answer = prompt(projectid_creation)
@@ -89,10 +89,13 @@ class CloudLaunchInstance:
                     "f1.micro",
                     "ami-0")
                 # Create GCP project
-                instance.create_gcp_project(
-                    projectid_answer["projectid"])
+                # instance.create_gcp_project(
+                #    projectid_answer["projectid"])
                 # TODO : Add code to get GCP regions and zones
-                sys.exit()
+                region_choices = instance.get_gcp_regions()
+                instance_type = GCP_INSTANCE_TYPES
+                instance.get_gcp_images()
+
             else:
                 sys.exit("No provider selected")
 
@@ -124,6 +127,15 @@ class CloudLaunchInstance:
                         'name': 'zone',
                         'message': 'what zone',
                         'choices': '1',
+                    },
+                ]
+            elif answers["provider"] == "gcp":
+                questions3 = [
+                    {
+                        'type': 'list',
+                        'name': 'zone',
+                        'message': 'what zone',
+                        'choices': instance.get_gcp_zones(answers2['region']),
                     },
                 ]
             questions3b = [
