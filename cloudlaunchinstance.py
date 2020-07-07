@@ -226,6 +226,19 @@ class CloudLaunchInstance:
             elif answers["provider"] == "gcp":
                 images = instance.get_gcp_images(
                     answers3b["sles_or_sap"], answers4["os"])
+                if not images:
+                    sys.exit(
+                        "\033[1;32;40m No GCP images for this OS. Exiting")
+                questions5 = [
+                    {
+                        'type': 'list',
+                        'name': 'image',
+                        'message': 'what image',
+                        'choices': images,
+                    },
+                ]
+                answers5 = prompt(questions5)
+                instance.set_ami(answers5["image"])
 
             questions6 = [
                 {

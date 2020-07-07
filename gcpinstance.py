@@ -126,6 +126,7 @@ class GCPInstance:
 
             for image in response['items']:
                 gcp_images.append(image['name'])
-        request = service.images().list_next(
-            previous_request=request, previous_response=response)
-        print(gcp_images)
+
+            request = service.images().list_next(
+                previous_request=request, previous_response=response)
+        return gcp_images
