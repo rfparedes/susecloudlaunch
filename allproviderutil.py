@@ -47,8 +47,9 @@ def get_terraform_project_dirs(provider):
 '''
 Provider agnostic function to destroy a terraform environment
 '''
-# TODO : make this function asynchronous? 
+# TODO : make this function asynchronous?
 # TODO : need to show output
+
 
 def destroy_terraform_env(provider, projectid):
     global done
@@ -147,7 +148,6 @@ def create_terraform_tfvars(
     tf.plan(capture_output=False)
     tf.apply(skip_plan=True, capture_output=True)
     my_ip = (tf.cmd("output", "ip"))
-    print (my_ip)
     print("\033[1;32;40m ssh " + username + "@" + my_ip[1])
 
 

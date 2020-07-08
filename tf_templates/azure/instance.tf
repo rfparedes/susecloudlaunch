@@ -37,6 +37,4 @@ resource "azurerm_linux_virtual_machine" "instance-1" {
   }
 }
 
-output "ip" {
-  value = azurerm_public_ip.scl_publicip.ip_address
-}
+
