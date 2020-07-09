@@ -6,3 +6,5 @@ instance = CloudLaunchInstance("nat-instance")
 # Clear screen
 os.system('clear')
 instance.user_interface()
+
+# TODO: option to display all created environments

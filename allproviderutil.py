@@ -137,6 +137,38 @@ def create_terraform_tfvars(
             "private_subnet_cidr_1": PRIVATE_SUBNET_CIDR_1
         }
 
+    elif provider == "gcp":
+        username = "gcpuser"
+        """Create tfvars file with instance data"""
+        template = """
+        # GCP Settings
+        gcp_region_1          = "{gcp_region_1}"
+        gcp_zone_1            = "{gcp_zone_1}"
+        gcp_project_1         = "{gcp_project_1}
+        ssh_keys              = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC8vQVGcwfKDT32QdWb9+PVVzAF1NVEUhOPmSbH7n8w2bIyGw7voUsEE9IdhmKr2qulnKJVRHd7XfEzBj0KJFTlkfSFEJHF/5TO4/oe4mEZkVE1H9XdnT8DsQ1Ytr+ewuRF9e5OKseQEZqPrINti4AzZ5McoS20McNNOiJCzzsn8n9NuJXBcnrBsmdj0wcJQodl3rV1v3w+rEuoosrTUqkoEn8wzySlSR3US9iYK6R/yeylVBJiPA5rCjox3SkAqsaxzfTaCNAfl5hOc+xRRU/+wIE0slro65HfwQDSJfqehJmeJ4EARInoxZabc061hVdLx2/JEIyawMvA/FDa2Qjd rich.paredes"
+        gcp_machine_type_1    = "{gcp_machine_type_1}"
+        gcp_image_1           = "{gcp_image_1}"
+
+        private_subnet_cidr_1 = "{private_subnet_cidr_1}"
+
+        """
+        # Get ssh public key of current logged in user
+        pubkey_path = str(Path.home()) + "/.ssh/id_rsa.pub"
+        f = open(pubkey_path, "r")
+        ssh_key = f.read()
+        # Split the uri image into individual
+        # publisher/offer/sku/version
+        context = {
+            "azure_region_1": region,
+            "azure_instance_type_1": instance_type,
+            "azure_image_offer": imageid.split(':')[1],
+            "azure_image_sku": imageid.split(':')[2],
+            "azure_image_version": imageid.split(':')[3],
+            "app_name_1": instance,
+            "private_vpc_cidr_1": PRIVATE_VPC_CIDR_1,
+            "private_subnet_cidr_1": PRIVATE_SUBNET_CIDR_1
+        }
+
     tfvars_path = os.path.join(
         TF_APPLY_LOCATION, provider, instance)
     with open(os.path.join(tfvars_path, "terraform.tfvars"), 'w') as myfile:
