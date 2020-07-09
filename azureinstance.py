@@ -2,6 +2,10 @@ from constants import *
 from azure.common.client_factory import get_client_from_cli_profile
 from azure.mgmt.subscription import SubscriptionClient
 from azure.mgmt.compute import ComputeManagementClient
+from allproviderutil import *
+import allproviderutil
+import threading
+import pickle
 
 
 class AzureInstance:
@@ -80,45 +84,70 @@ class AzureInstance:
             regions.append(location.name)
         return sorted(regions)
 
-    def get_azure_images(self, os_version):
+    def get_all_azure_images(self):
         """Get images via Azure SDK"""
-        publisher = "SUSE"
-        region = self.get_region()
-        compute_client = get_client_from_cli_profile(
-            ComputeManagementClient)
+        """Azure marketplace offer names and skus are nonsensical so it's difficult to programatically determine"""
+        allproviderutil.done = False
+        # If no azureimagecache, go out and get images from Azure
+        # TODO: if file is older than 7 days, also go out and get
+        # images from Azure
+        if (not (os.path.isfile('.azureimagecache'))):
+            publisher = "SUSE"
+            region = self.get_region()
+            compute_client = get_client_from_cli_profile(
+                ComputeManagementClient)
+            list_of_images = []
+            spin_thread = threading.Thread(target=spin_cursor)
+            print('\033[1;32;40m Getting Azure Images', end=" ")
+            spin_thread.start()
 
-        list_of_images = []
-        result_list_offers = compute_client.virtual_machine_images.list_offers(
-            region, publisher,)
-        for offer in result_list_offers:
-            result_list_skus = compute_client.virtual_machine_images.list_skus(
-                region,
-                publisher,
-                offer.name,
-            )
-            for sku in result_list_skus:
-                result_list = compute_client.virtual_machine_images.list(
+            result_list_offers = compute_client.virtual_machine_images.list_offers(
+                region, publisher,)
+            for offer in result_list_offers:
+                result_list_skus = compute_client.virtual_machine_images.list_skus(
                     region,
                     publisher,
                     offer.name,
-                    sku.name,
                 )
-                for version in result_list:
-                    result_get = compute_client.virtual_machine_images.get(
+                for sku in result_list_skus:
+                    result_list = compute_client.virtual_machine_images.list(
                         region,
                         publisher,
                         offer.name,
                         sku.name,
-                        version.name,
                     )
-                    #print(offer.name + "::" + sku.name)
-                    # TODO: Fix this, this is not correct. Need to
-                    # pull the images from multiple levels
-                    if os_version in offer.name or "SLES-SAP" in offer.name:
+                    for version in result_list:
+                        result_get = compute_client.virtual_machine_images.get(
+                            region,
+                            publisher,
+                            offer.name,
+                            sku.name,
+                            version.name,
+                        )
                         urn = (
                             publisher + ":" +
                             offer.name + ":" +
                             sku.name + ":" +
                             version.name)
                         list_of_images.append(urn)
-        return(list_of_images)
+            allproviderutil.done = True
+            spin_thread.join()
+            # cache the results
+            f = open(".azureimagecache", "wb")
+            pickle.dump(list_of_images, f)
+            f.close()
+            return(list_of_images)
+        else:
+            list_of_images = pickle.load(
+                open(".azureimagecache", "rb"))
+            return list_of_images
+
+        #           # TODO: Fix this, this is not correct. Need to
+        # # pull the images from multiple levels
+        # if os_version in offer.name or "SLES-SAP" in offer.name:
+        #     urn = (
+        #         publisher + ":" +
+        #         offer.name + ":" +
+        #         sku.name + ":" +
+        #         version.name)
+        #     list_of_images.append(urn)

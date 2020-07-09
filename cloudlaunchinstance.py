@@ -207,8 +207,7 @@ class CloudLaunchInstance:
                 instance.set_ami(image_id)
 
             elif answers["provider"] == "azure":
-                images = instance.get_azure_images(
-                    answers4["os"])
+                images = instance.get_all_azure_images()
                 # Exit if no images
                 if not images:
                     sys.exit(
