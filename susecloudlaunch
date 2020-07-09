@@ -20,7 +20,7 @@ if args.created:
         print()
 
 else:
-    instance = CloudLaunchInstance("nat-instance")
+    instance = CloudLaunchInstance("new-instance")
     # Clear screen
     os.system('clear')
     instance.user_interface()
