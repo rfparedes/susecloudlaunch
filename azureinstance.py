@@ -85,7 +85,7 @@ class AzureInstance:
         return sorted(regions)
 
     def get_all_azure_images(self):
-        """Get images via Azure SDK"""
+        """Get all images via Azure SDK"""
         """Azure marketplace offer names and skus are nonsensical so it's difficult to programatically determine"""
         allproviderutil.done = False
         # If no azureimagecache, go out and get images from Azure
@@ -142,12 +142,35 @@ class AzureInstance:
                 open(".azureimagecache", "rb"))
             return list_of_images
 
-        #           # TODO: Fix this, this is not correct. Need to
-        # # pull the images from multiple levels
-        # if os_version in offer.name or "SLES-SAP" in offer.name:
-        #     urn = (
-        #         publisher + ":" +
-        #         offer.name + ":" +
-        #         sku.name + ":" +
-        #         version.name)
-        #     list_of_images.append(urn)
+    def get_azure_images(self, list_of_images, os, sles_or_sap):
+        """Get images for specific os"""
+        """This code is crap and not general enough because of the inconsistency of our marketplace offer/skus"""
+        os_images = []
+
+        for image in list_of_images:
+            image = image.lower()
+            publisher, offer, sku, version = image.split(":")
+            # images are sles-12-sp4
+            if (os in 'sles-12-sp4') and ((sku in os and offer ==
+                                           "sles-byos") or (sku == "12-sp4-gen2" and offer == "sles")):
+                os_images.append(image.upper())
+            # images are sles-12-sp2 or sles-12-sp3
+            elif (os in ['sles-12-sp2', 'sles-12-sp3']) and (sku in os and offer == "sles-byos"):
+                os_images.append(image.upper())
+            # images are sles-15
+            elif (os in ['sles-15'] and (sku == '15' or sku == '15-gen2') and (offer == 'sles-byos')):
+                os_images.append(image.upper())
+            # images are sles-for-sap 12 sp2, sp3
+            elif ('sles-sap' in offer and sku in os):
+                os_images.append(image.upper())
+            # images are sles for sap 12 sp4
+            elif(os in ['sles-sap-12-sp4'] and sku == '12-sp4-gen2' and offer == "sles-sap"):
+                os_images.append(image.upper())
+            # images are sles for sap 15
+            elif (os in ['sles-sap-15'] and (sku == '15' or sku == 'gen2-15') and (offer == 'sles-sap-byos')):
+                os_images.append(image.upper())
+            # images are all others
+            elif (os in offer and sku == "gen2" and os != 'sles-15' and os != 'sles-sap-15'):
+                os_images.append(image.upper())
+
+        return os_images
