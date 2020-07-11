@@ -121,12 +121,13 @@ class GCPInstance:
 
         filter = "name=" + os + "*"
         request = service.images().list(project=project, filter=filter)
-        while request is not None:
-            response = request.execute()
+        # while request is not None:
+        response = request.execute()
 
-            for image in response['items']:
-                gcp_images.append(image['name'])
+        for image in response['items']:
+            gcp_images.append(image['name'])
 
-            request = service.images().list_next(
-                previous_request=request, previous_response=response)
+        request = service.images().list_next(
+            previous_request=request, previous_response=response)
+
         return gcp_images

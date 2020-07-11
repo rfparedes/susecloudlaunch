@@ -71,6 +71,9 @@ def destroy_terraform_env(provider, projectid):
 def create_terraform_tfvars(
         provider, region, zone, instance_type, imageid, instance):
 
+    # Get logged in users public key type and key
+    pubkey_type, pubkey = get_public_key()
+
     # TODO : for key pairs, use the ~/.ssh/id_rsa.pub as the default
     # keypair so whatever use is running this program
     if provider == "aws":
@@ -81,7 +84,7 @@ def create_terraform_tfvars(
         aws_region_1        =  "{aws_region_1}"
         aws_zone_1          =  "{aws_zone_1}"
         aws_profile_1       =  "default"
-        aws_key_pair_1      = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC8vQVGcwfKDT32QdWb9+PVVzAF1NVEUhOPmSbH7n8w2bIyGw7voUsEE9IdhmKr2qulnKJVRHd7XfEzBj0KJFTlkfSFEJHF/5TO4/oe4mEZkVE1H9XdnT8DsQ1Ytr+ewuRF9e5OKseQEZqPrINti4AzZ5McoS20McNNOiJCzzsn8n9NuJXBcnrBsmdj0wcJQodl3rV1v3w+rEuoosrTUqkoEn8wzySlSR3US9iYK6R/yeylVBJiPA5rCjox3SkAqsaxzfTaCNAfl5hOc+xRRU/+wIE0slro65HfwQDSJfqehJmeJ4EARInoxZabc061hVdLx2/JEIyawMvA/FDa2Qjd rich.paredes"
+        aws_key_pair_1      = "{pubkeytype} {pubkey} ec2-user"
         aws_instance_type_1 =  "{aws_instance_type_1}"
         aws_ami_1           =  "{aws_ami_1}"
 
@@ -98,16 +101,18 @@ def create_terraform_tfvars(
             "aws_zone_1": zone,
             "aws_instance_type_1": instance_type,
             "aws_ami_1": imageid,
-            "app_name_1": instance
+            "app_name_1": instance,
+            "pubkeytype": pubkey_type,
+            "pubkey": pubkey
         }
 
     elif provider == "azure":
-        username = "azureuser"
+        username = "azure-user"
         """Create tfvars file with instance data"""
         template = """
         # Azure Settings
         azure_region_1        = "{azure_region_1}"
-        azure_key_pair_1      = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC8vQVGcwfKDT32QdWb9+PVVzAF1NVEUhOPmSbH7n8w2bIyGw7voUsEE9IdhmKr2qulnKJVRHd7XfEzBj0KJFTlkfSFEJHF/5TO4/oe4mEZkVE1H9XdnT8DsQ1Ytr+ewuRF9e5OKseQEZqPrINti4AzZ5McoS20McNNOiJCzzsn8n9NuJXBcnrBsmdj0wcJQodl3rV1v3w+rEuoosrTUqkoEn8wzySlSR3US9iYK6R/yeylVBJiPA5rCjox3SkAqsaxzfTaCNAfl5hOc+xRRU/+wIE0slro65HfwQDSJfqehJmeJ4EARInoxZabc061hVdLx2/JEIyawMvA/FDa2Qjd rich.paredes"
+        azure_key_pair_1      = "{pubkeytype} {pubkey} {username}"
         azure_instance_type_1 = "Standard_{azure_instance_type_1}"
         azure_image_offer     = "{azure_image_offer}"
         azure_image_sku       = "{azure_image_sku}"
@@ -120,10 +125,7 @@ def create_terraform_tfvars(
         # Application Definition
         app_name_1        = "{app_name_1}"
         """
-        # Get ssh public key of current logged in user
-        pubkey_path = str(Path.home()) + "/.ssh/id_rsa.pub"
-        f = open(pubkey_path, "r")
-        ssh_key = f.read()
+
         # Split the uri image into individual
         # publisher/offer/sku/version
         context = {
@@ -134,39 +136,35 @@ def create_terraform_tfvars(
             "azure_image_version": imageid.split(':')[3],
             "app_name_1": instance,
             "private_vpc_cidr_1": PRIVATE_VPC_CIDR_1,
-            "private_subnet_cidr_1": PRIVATE_SUBNET_CIDR_1
+            "private_subnet_cidr_1": PRIVATE_SUBNET_CIDR_1,
+            "pubkeytype": pubkey_type,
+            "pubkey": pubkey,
+            "username": username
         }
 
     elif provider == "gcp":
-        username = "gcpuser"
+        username = "gce-user"
         """Create tfvars file with instance data"""
         template = """
         # GCP Settings
         gcp_region_1          = "{gcp_region_1}"
         gcp_zone_1            = "{gcp_zone_1}"
-        gcp_project_1         = "{gcp_project_1}
-        ssh_keys              = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC8vQVGcwfKDT32QdWb9+PVVzAF1NVEUhOPmSbH7n8w2bIyGw7voUsEE9IdhmKr2qulnKJVRHd7XfEzBj0KJFTlkfSFEJHF/5TO4/oe4mEZkVE1H9XdnT8DsQ1Ytr+ewuRF9e5OKseQEZqPrINti4AzZ5McoS20McNNOiJCzzsn8n9NuJXBcnrBsmdj0wcJQodl3rV1v3w+rEuoosrTUqkoEn8wzySlSR3US9iYK6R/yeylVBJiPA5rCjox3SkAqsaxzfTaCNAfl5hOc+xRRU/+wIE0slro65HfwQDSJfqehJmeJ4EARInoxZabc061hVdLx2/JEIyawMvA/FDa2Qjd rich.paredes"
+        gcp_project_1         = "{gcp_project_1}"
+        ssh_keys              = "{username}:{pubkeytype} {pubkey} {username}"
         gcp_machine_type_1    = "{gcp_machine_type_1}"
         gcp_image_1           = "{gcp_image_1}"
-
         private_subnet_cidr_1 = "{private_subnet_cidr_1}"
-
         """
-        # Get ssh public key of current logged in user
-        pubkey_path = str(Path.home()) + "/.ssh/id_rsa.pub"
-        f = open(pubkey_path, "r")
-        ssh_key = f.read()
-        # Split the uri image into individual
-        # publisher/offer/sku/version
         context = {
-            "azure_region_1": region,
-            "azure_instance_type_1": instance_type,
-            "azure_image_offer": imageid.split(':')[1],
-            "azure_image_sku": imageid.split(':')[2],
-            "azure_image_version": imageid.split(':')[3],
-            "app_name_1": instance,
-            "private_vpc_cidr_1": PRIVATE_VPC_CIDR_1,
-            "private_subnet_cidr_1": PRIVATE_SUBNET_CIDR_1
+            "gcp_region_1": region,
+            "gcp_zone_1": zone,
+            "gcp_project_1": instance,
+            "gcp_machine_type_1": instance_type,
+            "gcp_image_1": imageid,
+            "private_subnet_cidr_1": PRIVATE_SUBNET_CIDR_1,
+            "pubkeytype": pubkey_type,
+            "pubkey": pubkey,
+            "username": username
         }
 
     tfvars_path = os.path.join(
@@ -198,3 +196,11 @@ def spin_cursor():
             sys.stdout.write('\b')
             if done:
                 return
+
+
+def get_public_key():
+    """Get public key of logged in user"""
+    pubkey_path = str(Path.home()) + "/.ssh/id_rsa.pub"
+    f = open(pubkey_path, "r")
+    key_type, key, user = f.read().split()
+    return key_type, key

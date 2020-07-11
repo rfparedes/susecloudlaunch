@@ -224,6 +224,7 @@ class CloudLaunchInstance:
                 ]
                 answers5 = prompt(questions5)
                 instance.set_ami(answers5["image"])
+
             elif answers["provider"] == "gcp":
                 images = instance.get_gcp_images(
                     answers3b["sles_or_sap"], answers4["os"])
@@ -286,5 +287,5 @@ class CloudLaunchInstance:
                 allproviderutil.destroy_terraform_env(
                     (answers["provider"]), projectid_destroy_answer["projectid_destroy"])
 
-        else:
-            sys.exit('Neither create or destroy.  Exiting.')
+        # elif answers["purpose"] == "exit":
+        #     sys.exit('Exiting.')

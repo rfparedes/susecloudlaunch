@@ -6,7 +6,8 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser(description='susecloudlaunch')
-# Add argument which will show all created environments across CSP's
+# Add argument which will show all created environments across
+# CSP's
 parser.add_argument(
     "--created",
     help="Show all created environments", action="store_true")
@@ -20,6 +21,7 @@ if args.created:
         print()
 
 else:
+
     instance = CloudLaunchInstance("new-instance")
     # Clear screen
     os.system('clear')

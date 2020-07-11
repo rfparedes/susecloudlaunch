@@ -20,3 +20,6 @@
     - gcloud auth login
     - gcloud auth application-default login
     - enabled Cloud Resource Manager API
+
+
+- The public key of logged in user will be used to login to instances

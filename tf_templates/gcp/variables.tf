@@ -6,12 +6,6 @@ variable "gcp_project_1" {
   description = "GCP Project name 1"
 }
 
-# define service account
-variable "srv_acct" {
-  type        = string
-  description = "Service account"
-}
-
 # define ssh keys
 variable "ssh_keys" {
   type        = string
