@@ -8,7 +8,7 @@ resource "google_compute_instance" "instance-1" {
 
   boot_disk {
     initialize_params {
-      image = "projects/suse-cloud/global/images/${var.gcp_image_1}"
+      image = var.gcp_image_1
     }
   }
 

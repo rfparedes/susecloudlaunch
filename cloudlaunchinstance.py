@@ -240,7 +240,14 @@ class CloudLaunchInstance:
                     },
                 ]
                 answers5 = prompt(questions5)
-                instance.set_ami(answers5["image"])
+                if answers3b["sles_or_sap"] == "sles-sap":
+                    instance.set_ami(
+                        "projects/suse-sap-cloud/global/images/" +
+                        answers5["image"])
+                elif answers3b["sles_or_sap"] == "sles":
+                    instance.set_ami(
+                        "projects/suse-cloud/global/images/" +
+                        answers5["image"])
 
             questions6 = [
                 {
