@@ -3,6 +3,7 @@ from google.cloud import resource_manager
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
 from pprint import pprint
+import sys
 
 
 class GCPInstance:
@@ -108,6 +109,10 @@ class GCPInstance:
         """PROJECT suse-cloud is for SLES with FAMILY, sles-12 and sles15"""
         """PROJECT suse-sap-cloud is for SLE-SAP with FAMILY, sles-12-sp2-sap, sles-12-sp3-sap, sles-12-sp4-sap, sles-12-sp5-sap, sles-15-sap, sles-15-sp1-sap"""
         """can use list with project suse-cloud and filter name=sles-12-sp5*"""
+
+        # TODO: need to improve so no versions are hardcoded
+        if os == "sles-15":
+            sys.exit("No GCP images for this OS. Exiting")
         credentials = GoogleCredentials.get_application_default()
         service = discovery.build(
             'compute', 'v1', credentials=credentials)
@@ -116,18 +121,24 @@ class GCPInstance:
             project = "suse-cloud"
         elif sles_or_sap == "sles-sap":
             project = "suse-sap-cloud"
-        else:
-            sys.exit("Error. No GCP image project.")
+            # In GCP, SUSE SAP images are named sles-12-spX-sap instead of
+            # the expected sles-sap-12-spX so change this to get
+            # images
+            temp_os = os.split("-")
+            if (os == "sles-sap-15"):
+                os = temp_os[0] + '-' + temp_os[2] + \
+                    '-' + temp_os[1]
+            else:
+                os = temp_os[0] + '-' + temp_os[2] + \
+                    '-' + temp_os[3] + '-' + temp_os[1]
 
         filter = "name=" + os + "*"
         request = service.images().list(project=project, filter=filter)
-        # while request is not None:
+        # response is dict, what if no 'items' key, then no images
         response = request.execute()
-
-        for image in response['items']:
-            gcp_images.append(image['name'])
-
-        request = service.images().list_next(
-            previous_request=request, previous_response=response)
-
-        return gcp_images
+        if "items" in response.keys():
+            for image in response['items']:
+                gcp_images.append(image['name'])
+            request = service.images().list_next(
+                previous_request=request, previous_response=response)
+            return gcp_images
