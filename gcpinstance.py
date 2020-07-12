@@ -2,7 +2,6 @@ from constants import *
 from google.cloud import resource_manager
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
-from pprint import pprint
 from allproviderutil import *
 import sys
 
