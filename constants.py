@@ -1,5 +1,3 @@
-AZURE_AUTH_LOCATION = "/mercury/data/public-cloud/keys/azure/credentials.json"
-
 AWS_INSTANCE_TYPES = [
     't3.micro',
     't3.small',
@@ -52,4 +50,7 @@ TF_APPLY_LOCATION = "tf_apply"
 PRIVATE_VPC_CIDR_1 = "192.168.0.0/16"
 PRIVATE_SUBNET_CIDR_1 = "192.168.111.0/24"
 
+# FILENAMES
+AZURE_AUTH_LOCATION = "/mercury/data/public-cloud/keys/azure/credentials.json"
 REGION_CACHE_FILENAME = ".cache/.region-cache-"
+ZONE_CACHE_FILENAME = ".cache/.zone-cache-"

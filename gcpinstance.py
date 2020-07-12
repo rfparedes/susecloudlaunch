@@ -3,6 +3,7 @@ from google.cloud import resource_manager
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
 from pprint import pprint
+from allproviderutil import *
 import sys
 
 
@@ -77,22 +78,37 @@ class GCPInstance:
 
     def get_gcp_regions(self):
         """Get GCP available regions and zones in one API call"""
-        regions = []
-        zones = []
-        credentials = GoogleCredentials.get_application_default()
-        service = discovery.build(
-            'compute', 'v1', credentials=credentials)
-        project = self.get_instance()
-        request = service.regions().list(project=project)
-        while request is not None:
-            response = request.execute()
+        if (not (os.path.isfile(REGION_CACHE_FILENAME + self.get_provider()))):
+            regions = []
+            zones = []
+            credentials = GoogleCredentials.get_application_default()
+            service = discovery.build(
+                'compute', 'v1', credentials=credentials)
+            project = self.get_instance()
+            request = service.regions().list(project=project)
+            while request is not None:
+                response = request.execute()
 
-            for region in response['items']:
-                regions.append(region['name'])
-                for zone in region['zones']:
-                    zones.append(zone.rsplit('/', 1)[-1])
-            request = service.regions().list_next(
-                previous_request=request, previous_response=response)
+                for region in response['items']:
+                    regions.append(region['name'])
+                    for zone in region['zones']:
+                        zones.append(zone.rsplit('/', 1)[-1])
+                request = service.regions().list_next(
+                    previous_request=request, previous_response=response)
+            # Cache regions and zones
+            cache_write_data(
+                REGION_CACHE_FILENAME +
+                self.get_provider(), regions)
+            cache_write_data(
+                ZONE_CACHE_FILENAME +
+                self.get_provider(),
+                zones)
+
+        else:
+            regions = cache_read_data(REGION_CACHE_FILENAME +
+                                      self.get_provider())
+            zones = cache_read_data(
+                ZONE_CACHE_FILENAME + self.get_provider())
         return regions, zones
 
     def get_gcp_zones(self, region, zones):

@@ -106,11 +106,8 @@ class AWSInstance:
                 self.get_provider(),
                 regions_az)
         else:
-            spinner = Spinner(
-                '\033[1;32;40m getting regions and azs from cache ')
             regions_az = cache_read_data(
                 REGION_CACHE_FILENAME + self.get_provider())
-        spinner.finish()
 
         return regions_az
 
