@@ -299,7 +299,8 @@ class CloudLaunchInstance:
                         'default': False,
                     },
                 ]
-                if (prompt(destroy_confirm)) == True:
+                destroy_answer = prompt(destroy_confirm)
+                if destroy_answer['destroy_confirm'] == True:
                     allproviderutil.destroy_terraform_env(
                         (answers["provider"]), envid_destroy_answer["envid_destroy"])
                 else:

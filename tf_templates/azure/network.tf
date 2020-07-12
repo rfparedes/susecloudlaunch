@@ -31,7 +31,7 @@ resource "azurerm_public_ip" "scl_publicip" {
   name                = "${var.app_name_1}-publicip"
   location            = var.azure_region_1
   resource_group_name = azurerm_resource_group.scl_resource_group.name
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"
 
   tags = {
     environment = "${var.app_name_1}"
@@ -105,11 +105,6 @@ resource "azurerm_storage_account" "scl_sa" {
   }
 }
 
-data "azurerm_public_ip" "scl_publicip" {
-  name                = azurerm_public_ip.scl_publicip.name
-  resource_group_name = azurerm_resource_group.scl_resource_group.name
-}
-
 output "ip" {
-  value = data.azurerm_public_ip.scl_publicip.*.ip_address
+  value = azurerm_public_ip.scl_publicip.ip_address
 }

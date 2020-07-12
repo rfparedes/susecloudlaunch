@@ -180,24 +180,24 @@ class AzureInstance:
             # images are sles-12-sp4
             if (os in 'sles-12-sp4') and ((sku in os and offer ==
                                            "sles-byos") or (sku == "12-sp4-gen2" and offer == "sles")):
-                os_images.append(image.upper())
+                os_images.append(image)
             # images are sles-12-sp2 or sles-12-sp3
             elif (os in ['sles-12-sp2', 'sles-12-sp3']) and (sku in os and offer == "sles-byos"):
-                os_images.append(image.upper())
+                os_images.append(image)
             # images are sles-15
             elif (os in ['sles-15'] and (sku == '15' or sku == '15-gen2') and (offer == 'sles-byos')):
-                os_images.append(image.upper())
+                os_images.append(image)
             # images are sles-for-sap 12 sp2, sp3
             elif ('sles-sap' in offer and sku in os):
-                os_images.append(image.upper())
+                os_images.append(image)
             # images are sles for sap 12 sp4
             elif(os in ['sles-sap-12-sp4'] and sku == '12-sp4-gen2' and offer == "sles-sap"):
-                os_images.append(image.upper())
+                os_images.append(image)
             # images are sles for sap 15
             elif (os in ['sles-sap-15'] and (sku == '15' or sku == 'gen2-15') and (offer == 'sles-sap-byos')):
-                os_images.append(image.upper())
+                os_images.append(image)
             # images are all others
             elif (os in offer and sku == "gen2" and os != 'sles-15' and os != 'sles-sap-15'):
-                os_images.append(image.upper())
+                os_images.append(image)
 
         return os_images

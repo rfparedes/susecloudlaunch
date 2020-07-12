@@ -24,7 +24,7 @@ resource "azurerm_linux_virtual_machine" "instance-1" {
   disable_password_authentication = true
 
   admin_ssh_key {
-    username   = "azureuser"
+    username   = "azure-user"
     public_key = var.azure_key_pair_1
   }
 
