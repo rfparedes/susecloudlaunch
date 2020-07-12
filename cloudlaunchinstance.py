@@ -1,11 +1,11 @@
 from __future__ import print_function, unicode_literals
-from PyInquirer import prompt
+from PyInquirer import prompt, print_json, Separator, style_from_dict
 from constants import *
 from awsinstance import AWSInstance
 from azureinstance import AzureInstance
 from gcpinstance import GCPInstance
-import json
 import allproviderutil
+import json
 import sys
 
 
@@ -89,9 +89,49 @@ class CloudLaunchInstance:
                     "us-east1-b",
                     "f1.micro",
                     "ami-0")
-                # Create GCP project
-                # instance.create_gcp_project(
-                #    envid_answer["envid"])
+                # Select current GCP project or create new?
+                new_project_q = [
+                    {
+                        'type': 'list',
+                        'name': 'new_or_create_project',
+                        'message': 'Use new or existing GCP project: ',
+                        'choices': ['new', 'existing'],
+                    },
+                ]
+                new_project_a = prompt(new_project_q)
+                if new_project_a["new_or_create_project"] == "existing":
+                    # Get GCP project names
+                    project_names = []
+                    project_names = instance.get_gcp_projects()
+                    existing_project_q = [
+                        {
+                            'type': 'list',
+                            'name': 'gcp_project',
+                            'message': 'pick project to deploy in',
+                            'choices': project_names,
+                        },
+                    ]
+                    existing_project_a = prompt(existing_project_q)
+                    instance.set_instance(
+                        existing_project_a["gcp_project"])
+                else:
+                    # Create GCP project
+                    confirm_project_create_q = [
+                        {
+                            'type': 'confirm',
+                            'name': 'create_confirm',
+                            'message': 'Create new project : ' + envid_answer["envid"],
+                            'default': True,
+                        },
+                    ]
+                    confirm_project_create_a = prompt(
+                        confirm_project_create_q)
+                    if confirm_project_create_a['create_confirm'] == True:
+                        instance.create_gcp_project(
+                            envid_answer["envid"])
+                    else:
+                        sys.exit("Exiting.")
+
                 region_choices, gcp_zones = instance.get_gcp_regions()
                 instance_type = GCP_INSTANCE_TYPES
 
@@ -284,7 +324,7 @@ class CloudLaunchInstance:
                     {
                         'type': 'list',
                         'name': 'envid_destroy',
-                        'message': 'what project to destroy',
+                        'message': 'what environment to destroy',
                         'choices': project_names,
                     },
                 ]

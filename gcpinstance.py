@@ -2,8 +2,8 @@ from constants import *
 from google.cloud import resource_manager
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
-from allproviderutil import *
 import sys
+from allproviderutil import *
 
 
 class GCPInstance:
@@ -90,6 +90,15 @@ class GCPInstance:
         client = resource_manager.Client()
         new_project = client.new_project(envid, name=envid)
         new_project.create()
+
+    # --------------------------------------------------------------------
+    def get_gcp_projects(self):
+        """Return list of projects in user account"""
+        project_list = []
+        client = resource_manager.Client()
+        for project in client.list_projects():
+            project_list.append(project.project_id)
+        return project_list
 
     # --------------------------------------------------------------------
     def get_gcp_regions(self):

@@ -17,7 +17,6 @@
     - az login
 
 - Need the following to build instances in GCP
-    - gcloud auth login
     - gcloud auth application-default login
     - enabled Cloud Resource Manager API
 
