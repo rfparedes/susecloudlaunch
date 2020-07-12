@@ -8,6 +8,7 @@ import sys
 
 
 class GCPInstance:
+    """Store GCP instance information"""
 
     def __init__(self, name, provider, region,
                  zone, instance_type, imageid):
@@ -18,64 +19,80 @@ class GCPInstance:
         self._instance_type = instance_type
         self._imageid = imageid
 
+    # --------------------------------------------------------------------
     def __str__(self):
         return 'AWSInstance(name=' + self._instance + ', provider=' + self._provider + ', region=' + self._region + ', zone=' + \
             self._zone + ', type=' + self._instance_type + \
             ', imageid=' + self._imageid + ')'
 
+    # --------------------------------------------------------------------
     def get_instance(self):
         """Return name of instance"""
         return self._instance
 
+    # --------------------------------------------------------------------
     def set_instance(self, instance):
         """Set name of instance"""
         self._instance = instance
 
+    # --------------------------------------------------------------------
     def get_provider(self):
         """Return name of provider"""
         return self._provider
 
+    # --------------------------------------------------------------------
     def set_provider(self, provider):
         """Set name of provider"""
         self._provider = provider
 
+    # --------------------------------------------------------------------
     def get_region(self):
         """Return name of region"""
         return self._region
 
+    # --------------------------------------------------------------------
     def set_region(self, region):
         """Set region of instance"""
         self._region = region
 
+    # --------------------------------------------------------------------
     def get_zone(self):
         """Return name of zone"""
         return self._zone
 
+    # --------------------------------------------------------------------
     def set_zone(self, zone):
         """Set name of zone"""
         self._zone = zone
 
+    # --------------------------------------------------------------------
     def get_instance_type(self):
         """Get the instance type"""
         return self._instance_type
 
+    # --------------------------------------------------------------------
     def set_instance_type(self, instance_type):
         """Set the instance type"""
         self._instance_type = instance_type
 
+    # --------------------------------------------------------------------
     def get_image(self):
         """Return image id"""
         return self._imageid
 
+    # --------------------------------------------------------------------
     def set_ami(self, imageid):
         """Set ami id of instance"""
         self._imageid = imageid
 
+    # --------------------------------------------------------------------
     def create_gcp_project(self, envid):
+        """Create a new project"""
         client = resource_manager.Client()
         new_project = client.new_project(envid, name=envid)
         new_project.create()
 
+    # --------------------------------------------------------------------
     def get_gcp_regions(self):
         """Get GCP available regions and zones in one API call"""
         if (not (os.path.isfile(REGION_CACHE_FILENAME + self.get_provider()))):
@@ -111,6 +128,7 @@ class GCPInstance:
                 ZONE_CACHE_FILENAME + self.get_provider())
         return regions, zones
 
+    # --------------------------------------------------------------------
     def get_gcp_zones(self, region, zones):
         """Get GCP Zones for a region for zones already received from region call"""
         region_zones = []
@@ -119,6 +137,7 @@ class GCPInstance:
                 region_zones.append(zone)
         return region_zones
 
+    # --------------------------------------------------------------------
     def get_gcp_images(self, sles_or_sap, os):
         """Get GCP Images"""
         """GCP has PROJECT and FAMILY"""
