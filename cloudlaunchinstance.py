@@ -92,7 +92,6 @@ class CloudLaunchInstance:
                 # Create GCP project
                 # instance.create_gcp_project(
                 #    envid_answer["envid"])
-                # TODO : Add code to get GCP regions and zones
                 region_choices, gcp_zones = instance.get_gcp_regions()
                 instance_type = GCP_INSTANCE_TYPES
 
