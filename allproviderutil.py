@@ -1,6 +1,3 @@
-'''
-Utilities for all providers
-'''
 from constants import *
 from python_terraform import *
 from pathlib import *
@@ -11,12 +8,8 @@ import time
 import pickle
 
 
-'''
-Provider agnostic function to terraform template files to created project folder
-'''
-
-
 def cp_template(provider, envid):
+    """create terraform folder for environment"""
     src_files = os.listdir(
         os.path.join(
             TF_TEMPLATE_LOCATION,
@@ -31,28 +24,25 @@ def cp_template(provider, envid):
                 full_file_name,
                 make_dir)
 
-
-'''
-Get directory names from tf_apply to provide to user when selecting which project to destroy
-'''
+# --------------------------------------------------------------------
 
 
 def get_terraform_project_dirs(provider):
+    """Get directory names from tf_apply to provide to user when selecting which project to destroy"""
     # project_names = []
     tfvars_path = os.path.join(
         TF_APPLY_LOCATION, provider)
     project_names = os.listdir(tfvars_path)
     return project_names
 
+# --------------------------------------------------------------------
 
-'''
-Provider agnostic function to destroy a terraform environment
-'''
 # TODO : make this function asynchronous?
 # TODO : need to show output
 
 
 def destroy_terraform_env(provider, envid):
+    """destroy a terraform environment"""
     global done
     tfvars_path = os.path.join(
         TF_APPLY_LOCATION, provider, envid)
@@ -68,10 +58,12 @@ def destroy_terraform_env(provider, envid):
     # cleanup by deleting the directory
     shutil.rmtree(tfvars_path)
 
+# --------------------------------------------------------------------
+
 
 def create_terraform_tfvars(
         provider, region, zone, instance_type, imageid, instance):
-
+    """create environment using terraform"""
     # Get logged in users public key type and key
     pubkey_type, pubkey = get_public_key()
 
@@ -181,13 +173,11 @@ def create_terraform_tfvars(
     my_ip = (tf.cmd("output", "ip"))
     print("\033[1;32;40m ssh " + username + "@" + my_ip[1])
 
-
-'''
-https://stackoverflow.com/questions/48854567/python-asynchronous-progress-spinner
-'''
+# --------------------------------------------------------------------
 
 
 def spin_cursor():
+    """https://stackoverflow.com/questions/48854567/python-asynchronous-progress-spinner"""
     global done
     while True:
         for cursor in '|/-\\':
@@ -198,6 +188,8 @@ def spin_cursor():
             if done:
                 return
 
+# --------------------------------------------------------------------
+
 
 def get_public_key():
     """Get public key of logged in user"""
@@ -206,14 +198,20 @@ def get_public_key():
     key_type, key, user = f.read().split()
     return key_type, key
 
+# --------------------------------------------------------------------
+
 
 def cache_write_data(filename, data):
+    """Cache CSP object"""
     f = open(filename, "wb")
     pickle.dump(data, f)
     f.close()
 
+# --------------------------------------------------------------------
+
 
 def cache_read_data(filename):
+    """Read CSP object from cache"""
     data = pickle.load(open(filename, "rb"))
     # Should cache be invalidated?
     current_time = time.time()
