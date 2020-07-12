@@ -215,4 +215,10 @@ def cache_write_data(filename, data):
 
 def cache_read_data(filename):
     data = pickle.load(open(filename, "rb"))
+    # Should cache be invalidated?
+    current_time = time.time()
+    creation_time = os.path.getctime(filename)
+    if (current_time - creation_time) // (24 *
+                                          3600) >= CACHE_INVALIDATE_DAYS:
+        os.unlink(filename)
     return data
