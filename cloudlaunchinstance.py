@@ -291,8 +291,16 @@ class CloudLaunchInstance:
 
                 envid_destroy_answer = prompt(envid_select)
 
-                allproviderutil.destroy_terraform_env(
-                    (answers["provider"]), envid_destroy_answer["envid_destroy"])
-
-        # elif answers["purpose"] == "exit":
-        #     sys.exit('Exiting.')
+                destroy_confirm = [
+                    {
+                        'type': 'confirm',
+                        'name': 'destroy_confirm',
+                        'message': 'Are you sure: ',
+                        'default': False,
+                    },
+                ]
+                if (prompt(destroy_confirm)) == True:
+                    allproviderutil.destroy_terraform_env(
+                        (answers["provider"]), envid_destroy_answer["envid_destroy"])
+                else:
+                    sys.exit("Not destroying. Exiting")
