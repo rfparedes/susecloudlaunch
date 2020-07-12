@@ -4,7 +4,7 @@ from constants import *
 from awsinstance import AWSInstance
 from azureinstance import AzureInstance
 from gcpinstance import GCPInstance
-import allproviderutil
+from allproviderutil import *
 import sys
 
 
@@ -50,6 +50,7 @@ class CloudLaunchInstance:
                     'name': 'envid',
                     'message': 'specify unique environment name',
                     'default': 'suse-repro2',
+                    'validate': EnvNameValidator
                 },
             ]
             envid_answer = prompt(envid_creation)

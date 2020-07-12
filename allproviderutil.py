@@ -1,6 +1,7 @@
 from constants import *
 from python_terraform import *
 from pathlib import *
+from prompt_toolkit.validation import Validator, ValidationError
 import os
 import shutil
 import threading
@@ -220,3 +221,17 @@ def cache_read_data(filename):
                                           3600) >= CACHE_INVALIDATE_DAYS:
         os.unlink(filename)
     return data
+
+# --------------------------------------------------------------------
+
+
+class EnvNameValidator(Validator):
+    def validate(self, document):
+        """Validate the env name, must have 6 characters or more"""
+        if len(document.text) >= 6:
+            return True
+        else:
+            raise ValidationError(
+                message='Name must be 6 characters or more',
+                cursor_position=len(
+                    document.text))
