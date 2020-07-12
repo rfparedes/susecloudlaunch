@@ -8,6 +8,7 @@ import os
 import shutil
 import threading
 import time
+import pickle
 
 
 '''
@@ -204,3 +205,14 @@ def get_public_key():
     f = open(pubkey_path, "r")
     key_type, key, user = f.read().split()
     return key_type, key
+
+
+def cache_write_data(filename, data):
+    f = open(filename, "wb")
+    pickle.dump(data, f)
+    f.close()
+
+
+def cache_read_data(filename):
+    data = pickle.load(open(filename, "rb"))
+    return data

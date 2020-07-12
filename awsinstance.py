@@ -2,11 +2,10 @@ from progress.spinner import Spinner
 from constants import *
 from collections import OrderedDict
 from python_terraform import *
-import pickle
+from allproviderutil import *
 import boto3
 import time
 import os
-import allproviderutil
 
 
 class AWSInstance:
@@ -78,8 +77,7 @@ class AWSInstance:
         ec2 = boto3.client('ec2')
 
         regions_az = {}
-
-        if (not (os.path.isfile('.awsregionazcache'))):
+        if (not (os.path.isfile(REGION_CACHE_FILENAME + self.get_provider()))):
 
             spinner = Spinner(
                 '\033[1;32;40m getting regions and azs from AWS ')
@@ -103,14 +101,15 @@ class AWSInstance:
                     regions_az.setdefault(
                         my_region_name, set()).add(zone)
             # cache the results
-            f = open(".awsregionazcache", "wb")
-            pickle.dump(regions_az, f)
-            f.close()
-        # Cached
+            cache_write_data(
+                REGION_CACHE_FILENAME +
+                self.get_provider(),
+                regions_az)
         else:
             spinner = Spinner(
                 '\033[1;32;40m getting regions and azs from cache ')
-            regions_az = pickle.load(open(".awsregionazcache", "rb"))
+            regions_az = cache_read_data(
+                REGION_CACHE_FILENAME + self.get_provider())
         spinner.finish()
 
         return regions_az
