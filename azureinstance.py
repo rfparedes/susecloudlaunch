@@ -74,14 +74,24 @@ class AzureInstance:
 
     def get_azure_regions_azs(self):
         """Get regions via Azure SDK"""
-        subscription_client = get_client_from_cli_profile(
-            SubscriptionClient)
-        subscription = next(subscription_client.subscriptions.list())
-        locations = subscription_client.subscriptions.list_locations(
-            subscription.subscription_id)
-        regions = []
-        for location in locations:
-            regions.append(location.name)
+        if (not (os.path.isfile(REGION_CACHE_FILENAME + self.get_provider()))):
+            subscription_client = get_client_from_cli_profile(
+                SubscriptionClient)
+            subscription = next(
+                subscription_client.subscriptions.list())
+            locations = subscription_client.subscriptions.list_locations(
+                subscription.subscription_id)
+            regions = []
+            for location in locations:
+                regions.append(location.name)
+            # Cache region data
+            cache_write_data(
+                REGION_CACHE_FILENAME +
+                self.get_provider(), regions)
+        else:
+            regions = cache_read_data(
+                REGION_CACHE_FILENAME +
+                self.get_provider())
         return sorted(regions)
 
     def get_all_azure_images(self):
