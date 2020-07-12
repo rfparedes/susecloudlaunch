@@ -11,9 +11,9 @@ AZURE_INSTANCE_TYPES = [
     'B2ms']
 
 GCP_INSTANCE_TYPES = [
-    'f1.micro',
-    'n1-standard-1',
-    'n1-standard-2'
+    'e2-small',
+    'e2-medium',
+    'e2-standard-2'
 ]
 
 PROVIDERS = [

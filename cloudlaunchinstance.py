@@ -42,20 +42,21 @@ class CloudLaunchInstance:
         if answers["purpose"] == "create":
 
             # TODO: Minimum 6 character project name
-            projectid_creation = [
+            # TODO: Check if project name is already used currently
+            envid_creation = [
                 {
                     'type': 'input',
-                    'name': 'projectid',
-                    'message': 'specify unique project name',
+                    'name': 'envid',
+                    'message': 'specify unique environment name',
                     'default': 'suse-repro2',
                 },
             ]
-            projectid_answer = prompt(projectid_creation)
+            envid_answer = prompt(envid_creation)
 
             if answers["provider"] == "aws":
                 # create AWS instance object
                 instance = AWSInstance(
-                    projectid_answer["projectid"],
+                    envid_answer["envid"],
                     "aws",
                     "us-east-1",
                     "us-east-1a",
@@ -69,7 +70,7 @@ class CloudLaunchInstance:
             elif answers["provider"] == "azure":
                 # create Azure instance object
                 instance = AzureInstance(
-                    projectid_answer["projectid"],
+                    envid_answer["envid"],
                     "azure",
                     "eastus",
                     "1",
@@ -82,7 +83,7 @@ class CloudLaunchInstance:
             elif answers["provider"] == "gcp":
                 # create GCP instance object
                 instance = GCPInstance(
-                    projectid_answer["projectid"],
+                    envid_answer["envid"],
                     "gcp",
                     "us-east1",
                     "us-east1-b",
@@ -90,7 +91,7 @@ class CloudLaunchInstance:
                     "ami-0")
                 # Create GCP project
                 # instance.create_gcp_project(
-                #    projectid_answer["projectid"])
+                #    envid_answer["envid"])
                 # TODO : Add code to get GCP regions and zones
                 region_choices, gcp_zones = instance.get_gcp_regions()
                 instance_type = GCP_INSTANCE_TYPES
@@ -280,19 +281,19 @@ class CloudLaunchInstance:
                 sys.exit(
                     '\033[1;32;40m No projects to destroy. Exiting')
             else:
-                projectid_select = [
+                envid_select = [
                     {
                         'type': 'list',
-                        'name': 'projectid_destroy',
+                        'name': 'envid_destroy',
                         'message': 'what project to destroy',
                         'choices': project_names,
                     },
                 ]
 
-                projectid_destroy_answer = prompt(projectid_select)
+                envid_destroy_answer = prompt(envid_select)
 
                 allproviderutil.destroy_terraform_env(
-                    (answers["provider"]), projectid_destroy_answer["projectid_destroy"])
+                    (answers["provider"]), envid_destroy_answer["envid_destroy"])
 
         # elif answers["purpose"] == "exit":
         #     sys.exit('Exiting.')

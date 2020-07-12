@@ -70,9 +70,9 @@ class GCPInstance:
         """Set ami id of instance"""
         self._imageid = imageid
 
-    def create_gcp_project(self, projectid):
+    def create_gcp_project(self, envid):
         client = resource_manager.Client()
-        new_project = client.new_project(projectid, name=projectid)
+        new_project = client.new_project(envid, name=envid)
         new_project.create()
 
     def get_gcp_regions(self):

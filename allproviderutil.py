@@ -15,12 +15,12 @@ Provider agnostic function to terraform template files to created project folder
 '''
 
 
-def cp_template(provider, projectid):
+def cp_template(provider, envid):
     src_files = os.listdir(
         os.path.join(
             TF_TEMPLATE_LOCATION,
             provider))
-    make_dir = os.path.join(TF_APPLY_LOCATION, provider, projectid)
+    make_dir = os.path.join(TF_APPLY_LOCATION, provider, envid)
     os.makedirs(make_dir, exist_ok=True)
     for file_name in src_files:
         full_file_name = os.path.join(
@@ -51,15 +51,15 @@ Provider agnostic function to destroy a terraform environment
 # TODO : need to show output
 
 
-def destroy_terraform_env(provider, projectid):
+def destroy_terraform_env(provider, envid):
     global done
     tfvars_path = os.path.join(
-        TF_APPLY_LOCATION, provider, projectid)
+        TF_APPLY_LOCATION, provider, envid)
     tf = Terraform(
         working_dir=tfvars_path)
     done = False
     spin_thread = threading.Thread(target=spin_cursor)
-    print('\033[1;32;40m destroying ' + projectid + ' ', end=" ")
+    print('\033[1;32;40m destroying ' + envid + ' ', end=" ")
     spin_thread.start()
     tf.destroy(capture_output=True)
     done = True
