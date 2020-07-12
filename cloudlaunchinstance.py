@@ -5,15 +5,16 @@ from awsinstance import AWSInstance
 from azureinstance import AzureInstance
 from gcpinstance import GCPInstance
 import allproviderutil
-import json
 import sys
 
 
 class CloudLaunchInstance:
+    """Store user interface information"""
 
     def __init__(self, name):
         self.name = name
 
+    # --------------------------------------------------------------------
     def user_interface(self):
         """ Provide terminal user interface to get user prompts and preferences """
 
