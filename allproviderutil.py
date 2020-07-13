@@ -53,11 +53,17 @@ def destroy_terraform_env(provider, envid):
     spin_thread = threading.Thread(target=spin_cursor)
     print('\033[1;32;40m destroying ' + envid + ' ', end=" ")
     spin_thread.start()
-    tf.destroy(capture_output=True)
+    return_code, stdout, stderr = (tf.destroy(capture_output=True))
     done = True
     spin_thread.join()
-    # cleanup by deleting the directory
-    shutil.rmtree(tfvars_path)
+    if return_code == 1:
+        print(stderr)
+        print("\033[1;32;40m Destroy failed.")
+    else:
+        print(stdout)
+        print("\033[1;32;40m Destroy successful.")
+        # cleanup by deleting the directory
+        shutil.rmtree(tfvars_path)
 
 # --------------------------------------------------------------------
 
@@ -172,9 +178,18 @@ def create_terraform_tfvars(
         working_dir=tfvars_path)
     tf.init(capture_output=False)
     tf.plan(capture_output=False)
-    tf.apply(skip_plan=True, capture_output=True)
-    my_ip = (tf.cmd("output", "ip"))
-    print("\033[1;32;40m ssh " + username + "@" + my_ip[1])
+    return_code, stdout, stderr = tf.apply(
+        skip_plan=True, capture_output=True)
+    if return_code == 1:
+        print("\033[1;32;40m Deployment failed.")
+        print(stderr)
+        print("Rolling back.")
+        destroy_terraform_env(provider, instance)
+
+    else:
+        print("\033[1;32;40m Deployment successful.")
+        my_ip = (tf.cmd("output", "ip"))
+        print("\033[1;32;40m ssh " + username + "@" + my_ip[1])
 
 # --------------------------------------------------------------------
 

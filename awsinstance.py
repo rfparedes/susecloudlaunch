@@ -12,7 +12,7 @@ class AWSInstance:
     """Store AWS instance information"""
 
     def __init__(self, name, provider, region,
-                 zone, instance_type, imageid):
+                 zone, instance_type, imageid, projectid):
         self._instance = name
         self._provider = provider
         self._region = region
