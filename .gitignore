@@ -8,4 +8,5 @@ tf_apply/azure/*
 local-sp.json
 .vscode
 @eaDir
-.awsregionazcache
+.cache/*
+pyvenv.cfg
