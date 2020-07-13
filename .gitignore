@@ -2,8 +2,8 @@ bin
 lib
 lib64
 __pycache__
-#tf_apply/aws*
-#!tf_apply/
+tf_apply/aws*
+!tf_apply/
 local-sp.json
 .vscode
 @eaDir
