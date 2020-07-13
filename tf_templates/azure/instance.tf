@@ -20,7 +20,7 @@ resource "azurerm_linux_virtual_machine" "instance-1" {
   }
 
   computer_name                   = var.app_name_1
-  admin_username                  = "azureuser"
+  admin_username                  = "azure-user"
   disable_password_authentication = true
 
   admin_ssh_key {

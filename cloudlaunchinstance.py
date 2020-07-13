@@ -280,23 +280,15 @@ class CloudLaunchInstance:
                 cp_template(
                     instance.get_provider(), instance.get_instance())
 
-                if instance.get_provider() == "gcp":
-                    create_terraform_tfvars(
-                        instance.get_provider(),
-                        instance.get_region(),
-                        instance.get_zone(),
-                        instance.get_instance_type(),
-                        instance.get_image(),
-                        instance.get_instance(),
-                        instance.get_projectid())
-                else:
-                    create_terraform_tfvars(
-                        instance.get_provider(),
-                        instance.get_region(),
-                        instance.get_zone(),
-                        instance.get_instance_type(),
-                        instance.get_image(),
-                        instance.get_instance())
+                create_terraform_tfvars(
+                    instance.get_provider(),
+                    instance.get_region(),
+                    instance.get_zone(),
+                    instance.get_instance_type(),
+                    instance.get_image(),
+                    instance.get_instance(),
+                    instance.get_projectid())
+
             else:
                 sys.exit("\033[1;32;40m Exiting")
 
