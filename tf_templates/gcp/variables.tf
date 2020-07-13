@@ -6,6 +6,12 @@ variable "gcp_project_1" {
   description = "GCP Project name 1"
 }
 
+# define GCP environment name
+variable "gcp_env_1" {
+  type        = string
+  description = "GCP env name 1"
+}
+
 # define ssh keys
 variable "ssh_keys" {
   type        = string

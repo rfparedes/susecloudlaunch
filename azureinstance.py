@@ -19,12 +19,13 @@ class AzureInstance:
         self._zone = zone
         self._instance_type = instance_type
         self._imageid = imageid
+        self._projectid = projectid
 
     # --------------------------------------------------------------------
     def __str__(self):
         return 'AWSInstance(name=' + self._instance + ', provider=' + self._provider + ', region=' + self._region + ', zone=' + \
             self._zone + ', type=' + self._instance_type + \
-            ', imageid=' + self._imageid + ')'
+            ', imageid=' + self._imageid + ', projectid=' + self._projectid + ')'
 
     # --------------------------------------------------------------------
     def get_instance(self):
@@ -87,6 +88,17 @@ class AzureInstance:
         self._imageid = imageid
 
     # --------------------------------------------------------------------
+    def get_projectid(self):
+        """Return project id"""
+        return self._projectid
+
+    # --------------------------------------------------------------------
+    def set_projectid(self, projectid):
+        """Set projectid of instance"""
+        self._projectid = projectid
+
+    # --------------------------------------------------------------------
+
     def get_azure_regions_azs(self):
         """Get regions via Azure SDK"""
         if (not (os.path.isfile(REGION_CACHE_FILENAME + self.get_provider()))):

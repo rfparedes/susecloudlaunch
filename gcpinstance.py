@@ -10,19 +10,20 @@ class GCPInstance:
     """Store GCP instance information"""
 
     def __init__(self, name, provider, region,
-                 zone, instance_type, imageid):
+                 zone, instance_type, imageid, projectid):
         self._instance = name
         self._provider = provider
         self._region = region
         self._zone = zone
         self._instance_type = instance_type
         self._imageid = imageid
+        self._projectid = projectid
 
     # --------------------------------------------------------------------
     def __str__(self):
         return 'AWSInstance(name=' + self._instance + ', provider=' + self._provider + ', region=' + self._region + ', zone=' + \
             self._zone + ', type=' + self._instance_type + \
-            ', imageid=' + self._imageid + ')'
+            ', imageid=' + self._imageid + ', projectid=' + self._projectid + ')'
 
     # --------------------------------------------------------------------
     def get_instance(self):
@@ -85,11 +86,14 @@ class GCPInstance:
         self._imageid = imageid
 
     # --------------------------------------------------------------------
-    def create_gcp_project(self, envid):
-        """Create a new project"""
-        client = resource_manager.Client()
-        new_project = client.new_project(envid, name=envid)
-        new_project.create()
+    def get_projectid(self):
+        """Return project id"""
+        return self._projectid
+
+    # --------------------------------------------------------------------
+    def set_projectid(self, projectid):
+        """Set projectid of instance"""
+        self._projectid = projectid
 
     # --------------------------------------------------------------------
     def get_gcp_projects(self):

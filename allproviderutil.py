@@ -63,7 +63,7 @@ def destroy_terraform_env(provider, envid):
 
 
 def create_terraform_tfvars(
-        provider, region, zone, instance_type, imageid, instance):
+        provider, region, zone, instance_type, imageid, instance, projectid):
     """create environment using terraform"""
     # Get logged in users public key type and key
     pubkey_type, pubkey = get_public_key()
@@ -148,17 +148,19 @@ def create_terraform_tfvars(
         gcp_machine_type_1    = "{gcp_machine_type_1}"
         gcp_image_1           = "{gcp_image_1}"
         private_subnet_cidr_1 = "{private_subnet_cidr_1}"
+        gcp_env_1             = "{gcp_env_1}"
         """
         context = {
             "gcp_region_1": region,
             "gcp_zone_1": zone,
-            "gcp_project_1": instance,
+            "gcp_project_1": projectid,
             "gcp_machine_type_1": instance_type,
             "gcp_image_1": imageid,
             "private_subnet_cidr_1": PRIVATE_SUBNET_CIDR_1,
             "pubkeytype": pubkey_type,
             "pubkey": pubkey,
-            "username": username
+            "username": username,
+            "gcp_env_1": instance
         }
 
     tfvars_path = os.path.join(

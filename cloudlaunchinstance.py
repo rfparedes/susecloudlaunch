@@ -63,7 +63,8 @@ class CloudLaunchInstance:
                     "us-east-1",
                     "us-east-1a",
                     "t3.micro",
-                    "ami-0")
+                    "ami-0",
+                    "projectid")
                 # Contact AWS and get regions and azs
                 regions_zones = instance.get_aws_regions_azs()
                 instance_type = AWS_INSTANCE_TYPES
@@ -77,7 +78,8 @@ class CloudLaunchInstance:
                     "eastus",
                     "1",
                     "Standard_B1s",
-                    "ami-0")
+                    "ami-0",
+                    "projectid")
                 region_choices = instance.get_azure_regions_azs()
                 instance_type = AZURE_INSTANCE_TYPES
                 regions_zones = 1
@@ -90,49 +92,22 @@ class CloudLaunchInstance:
                     "us-east1",
                     "us-east1-b",
                     "f1.micro",
-                    "ami-0")
-                # Select current GCP project or create new?
-                new_project_q = [
+                    "ami-0",
+                    "projectid")
+                # Get GCP project names
+                project_names = []
+                project_names = instance.get_gcp_projects()
+                existing_project_q = [
                     {
                         'type': 'list',
-                        'name': 'new_or_create_project',
-                        'message': 'Use new or existing GCP project: ',
-                        'choices': ['new', 'existing'],
+                        'name': 'gcp_project',
+                        'message': 'pick GCP project to deploy in',
+                        'choices': project_names,
                     },
                 ]
-                new_project_a = prompt(new_project_q)
-                if new_project_a["new_or_create_project"] == "existing":
-                    # Get GCP project names
-                    project_names = []
-                    project_names = instance.get_gcp_projects()
-                    existing_project_q = [
-                        {
-                            'type': 'list',
-                            'name': 'gcp_project',
-                            'message': 'pick project to deploy in',
-                            'choices': project_names,
-                        },
-                    ]
-                    existing_project_a = prompt(existing_project_q)
-                    instance.set_instance(
-                        existing_project_a["gcp_project"])
-                else:
-                    # Create GCP project
-                    confirm_project_create_q = [
-                        {
-                            'type': 'confirm',
-                            'name': 'create_confirm',
-                            'message': 'Create new project : ' + envid_answer["envid"],
-                            'default': True,
-                        },
-                    ]
-                    confirm_project_create_a = prompt(
-                        confirm_project_create_q)
-                    if confirm_project_create_a['create_confirm'] == True:
-                        instance.create_gcp_project(
-                            envid_answer["envid"])
-                    else:
-                        sys.exit("Exiting.")
+                existing_project_a = prompt(existing_project_q)
+                instance.set_projectid(
+                    existing_project_a["gcp_project"])
 
                 region_choices, gcp_zones = instance.get_gcp_regions()
                 instance_type = GCP_INSTANCE_TYPES
@@ -302,11 +277,26 @@ class CloudLaunchInstance:
             answers6 = prompt(questions6)
             if (answers6["confirm"]) == True:
                 # Prepare tf apply directory
-                allproviderutil.cp_template(
+                cp_template(
                     instance.get_provider(), instance.get_instance())
 
-                allproviderutil.create_terraform_tfvars(
-                    instance.get_provider(), instance.get_region(), instance.get_zone(), instance.get_instance_type(), instance.get_image(), instance.get_instance())
+                if instance.get_provider() == "gcp":
+                    create_terraform_tfvars(
+                        instance.get_provider(),
+                        instance.get_region(),
+                        instance.get_zone(),
+                        instance.get_instance_type(),
+                        instance.get_image(),
+                        instance.get_instance(),
+                        instance.get_projectid())
+                else:
+                    create_terraform_tfvars(
+                        instance.get_provider(),
+                        instance.get_region(),
+                        instance.get_zone(),
+                        instance.get_instance_type(),
+                        instance.get_image(),
+                        instance.get_instance())
             else:
                 sys.exit("\033[1;32;40m Exiting")
 
@@ -314,7 +304,7 @@ class CloudLaunchInstance:
         elif answers["purpose"] == "destroy":
 
             # Get current projects that can be destroyed
-            project_names = allproviderutil.get_terraform_project_dirs(
+            project_names = get_terraform_project_dirs(
                 answers["provider"])
 
             # No projects ever created so exit
@@ -343,7 +333,7 @@ class CloudLaunchInstance:
                 ]
                 destroy_answer = prompt(destroy_confirm)
                 if destroy_answer['destroy_confirm'] == True:
-                    allproviderutil.destroy_terraform_env(
+                    destroy_terraform_env(
                         (answers["provider"]), envid_destroy_answer["envid_destroy"])
                 else:
                     sys.exit("Not destroying. Exiting")

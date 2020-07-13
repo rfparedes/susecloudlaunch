@@ -1,6 +1,6 @@
 # Create instance 
 resource "google_compute_instance" "instance-1" {
-  name         = "${var.gcp_project_1}-instance"
+  name         = "${var.gcp_env_1}-instance"
   machine_type = var.gcp_machine_type_1
   zone         = var.gcp_zone_1
 
@@ -23,10 +23,6 @@ resource "google_compute_instance" "instance-1" {
       nat_ip = google_compute_address.static.address
     }
   }
-  #   service_account {
-  #     email  = var.srv_acct
-  #     scopes = []
-  #   }
   allow_stopping_for_update = true
 }
 
