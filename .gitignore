@@ -5,9 +5,6 @@ __pycache__
 tf_apply/aws/*
 tf_apply/azure/*
 tf_apply/gcp/*
-!tf_apply/aws/
-!tf_apply/azure/
-!tf_apply/gcp/
 local-sp.json
 .vscode
 @eaDir
