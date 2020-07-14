@@ -48,8 +48,8 @@ class CloudLaunchInstance:
                 {
                     'type': 'input',
                     'name': 'envid',
-                    'message': 'specify unique environment name',
-                    'default': 'suse-repro2',
+                    'message': 'unique environment name (min 6 chars)',
+                    'default': '',
                     'validate': EnvNameValidator
                 },
             ]

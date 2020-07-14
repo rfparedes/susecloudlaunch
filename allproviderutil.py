@@ -60,7 +60,6 @@ def destroy_terraform_env(provider, envid):
         print(stderr)
         print("\033[1;32;40m Destroy failed.")
     else:
-        print(stdout)
         print("\033[1;32;40m Destroy successful.")
         # cleanup by deleting the directory
         shutil.rmtree(tfvars_path)
