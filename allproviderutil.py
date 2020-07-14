@@ -44,6 +44,7 @@ def get_terraform_project_dirs(provider):
 
 def destroy_terraform_env(provider, envid):
     """destroy a terraform environment"""
+    print("\033[1;32;40m This may take time and depends on provider")
     global done
     tfvars_path = os.path.join(
         TF_APPLY_LOCATION, provider, envid)
