@@ -154,7 +154,12 @@ class AWSInstance:
             'Values': [os]
         }]
         image_info = {}
-        spinner = Spinner('\033[1;32;40m getting images from AWS ')
+        spinner = Spinner(
+            OKGREEN +
+            "Getting images from AWS" +
+            ' ' +
+            ENDC,
+            end=" ")
         aws_images = ec2.describe_images(Filters=filters)
         for image in aws_images['Images']:
             image_info[image['ImageId']] = {}

@@ -5,24 +5,24 @@ from constants import *
 import os
 import argparse
 
-parser = argparse.ArgumentParser(description='susecloudlaunch')
+parser = argparse.ArgumentParser(
+    description='susecloudlaunch')
 parser.add_argument(
-    "--created",
+    "-c",
     help="Show all created environments", action="store_true")
 parser.add_argument(
-    "--destroy", nargs=2, help="Destroy environment", action="store", metavar=("env_name", "provider_name"))
+    "-d", nargs=2, help="Destroy environment (e.g. -d myenv aws)", action="store", metavar=("env", "provider"))
 args = parser.parse_args()
-if args.created:
+if args.c:
     # Clear screen
     os.system('clear')
     for provider in PROVIDERS:
-        print('\033[0;32m' + provider.upper() + '\033[0m')
+        print(OKGREEN + provider.upper() + ENDC)
         print(*get_terraform_project_dirs(provider), sep='\n')
         print()
-elif args.destroy:
-
-    provider = args.destroy[1].lower()
-    env_name = args.destroy[0].lower()
+elif args.d:
+    provider = args.d[1].lower()
+    env_name = args.d[0].lower()
     if provider in ["aws", "azure", "gcp"]:
         if env_name in get_terraform_project_dirs(provider):
             destroy_terraform_env(provider, env_name)
@@ -30,6 +30,7 @@ elif args.destroy:
             print("No environment by that name.")
     else:
         print("No provider by that name")
+
 else:
     instance = CloudLaunchInstance("new-instance")
     # Clear screen

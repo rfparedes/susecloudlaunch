@@ -136,7 +136,7 @@ class AzureInstance:
                 ComputeManagementClient)
             list_of_images = []
             spin_thread = threading.Thread(target=spin_cursor)
-            print('\033[1;32;40m Getting Azure Images', end=" ")
+            print(OKGREEN + "Getting Azure Images", end=" ")
             spin_thread.start()
 
             result_list_offers = compute_client.virtual_machine_images.list_offers(

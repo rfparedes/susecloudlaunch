@@ -19,7 +19,7 @@ class CloudLaunchInstance:
         """ Provide terminal user interface to get user prompts and preferences """
 
         print(
-            '\033[1;32;40m susecloudlaunch - Launch SLE instance on AWS,Azure,GCP')
+            OKGREEN + 'susecloudlaunch - Launch SLE instance on AWS,Azure,GCP' + ENDC)
         # Ask user first set of questions
         purpose_options = ['create', 'destroy']
         questions = [

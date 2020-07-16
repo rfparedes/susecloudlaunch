@@ -44,7 +44,7 @@ def get_terraform_project_dirs(provider):
 
 def destroy_terraform_env(provider, envid):
     """destroy a terraform environment"""
-    print("\033[1;32;40m This may take time and depends on provider")
+    print(WARNING + "This may take time and depends on provider" + ENDC)
     global done
     tfvars_path = os.path.join(
         TF_APPLY_LOCATION, provider, envid)
@@ -52,16 +52,18 @@ def destroy_terraform_env(provider, envid):
         working_dir=tfvars_path)
     done = False
     spin_thread = threading.Thread(target=spin_cursor)
-    print('\033[1;32;40m destroying ' + envid + ' ', end=" ")
+    print(OKGREEN + 'Destroying ' + envid + ' ' + ENDC, end=" ")
     spin_thread.start()
     return_code, stdout, stderr = (tf.destroy(capture_output=True))
     done = True
     spin_thread.join()
     if return_code == 1:
         print(stderr)
-        print("\033[1;32;40m Destroy failed.")
+        print(FAIL +
+              "Destroy failed. Manually deleting the environment directory " +
+              tfvars_path + ENDC)
     else:
-        print("\033[1;32;40m Destroy successful.")
+        print(OKGREEN + "Destroy successful." + ENDC)
         # cleanup by deleting the directory
         shutil.rmtree(tfvars_path)
 
@@ -169,6 +171,7 @@ def create_terraform_tfvars(
             "gcp_env_1": instance
         }
 
+    global done
     tfvars_path = os.path.join(
         TF_APPLY_LOCATION, provider, instance)
     with open(os.path.join(tfvars_path, "terraform.tfvars"), 'w') as myfile:
@@ -176,20 +179,28 @@ def create_terraform_tfvars(
 
     tf = Terraform(
         working_dir=tfvars_path)
-    tf.init(capture_output=False)
-    tf.plan(capture_output=False)
+    done = False
+    spin_thread = threading.Thread(target=spin_cursor)
+    print(OKGREEN + "Creating " + instance + ' ' + ENDC, end=" ")
+    spin_thread.start()
+    tf.init(capture_output=True)
+    tf.plan(capture_output=True)
     return_code, stdout, stderr = tf.apply(
         skip_plan=True, capture_output=True)
+    done = True
+    spin_thread.join()
     if return_code == 1:
-        print("\033[1;32;40m Deployment failed.")
-        print(stderr)
-        print("Rolling back.")
+        print()
+        print(FAIL + "Deployment failed." + ENDC)
+        print(FAIL + stderr + ENDC)
+        print(WARNING + "Rolling back." + ENDC)
         destroy_terraform_env(provider, instance)
 
     else:
-        print("\033[1;32;40m Deployment successful.")
+        print()
+        print(OKGREEN + "Deployment successful." + ENDC)
         my_ip = (tf.cmd("output", "ip"))
-        print("\033[1;32;40m ssh " + username + "@" + my_ip[1])
+        print(OKBLUE + "ssh " + username + "@" + my_ip[1] + ENDC)
 
 # --------------------------------------------------------------------
 

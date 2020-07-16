@@ -65,3 +65,14 @@ CACHE_INVALIDATE_DAYS = 7
 AZURE_AUTH_LOCATION = "/mercury/data/public-cloud/keys/azure/credentials.json"
 REGION_CACHE_FILENAME = ".cache/.region-cache-"
 ZONE_CACHE_FILENAME = ".cache/.zone-cache-"
+
+# --------------------------------------------------------------------
+# Colors
+HEADER = '\033[95m'
+OKBLUE = '\033[94m'
+OKGREEN = '\033[92m'
+WARNING = '\033[93m'
+FAIL = '\033[91m'
+ENDC = '\033[0m'
+BOLD = '\033[1m'
+UNDERLINE = '\033[4m'
