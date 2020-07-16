@@ -58,11 +58,13 @@ def destroy_terraform_env(provider, envid):
     done = True
     spin_thread.join()
     if return_code == 1:
+        print()
         print(stderr)
         print(FAIL +
               "Destroy failed. Manually deleting the environment directory " +
               tfvars_path + ENDC)
     else:
+        print()
         print(OKGREEN + "Destroy successful." + ENDC)
         # cleanup by deleting the directory
         shutil.rmtree(tfvars_path)
@@ -181,7 +183,15 @@ def create_terraform_tfvars(
         working_dir=tfvars_path)
     done = False
     spin_thread = threading.Thread(target=spin_cursor)
-    print(OKGREEN + "Creating " + instance + ' ' + ENDC, end=" ")
+    print(
+        OKGREEN +
+        "Creating " +
+        instance +
+        " in " +
+        provider.upper() +
+        ' ' +
+        ENDC,
+        end=" ")
     spin_thread.start()
     tf.init(capture_output=True)
     tf.plan(capture_output=True)
