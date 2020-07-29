@@ -99,8 +99,10 @@ class GCPInstance:
     def get_gcp_projects(self):
         """Return list of projects in user account"""
         project_list = []
+        # Filter on only the active projects
+        env_filter = {'lifecycleState': 'ACTIVE'}
         client = resource_manager.Client()
-        for project in client.list_projects():
+        for project in client.list_projects(env_filter):
             project_list.append(project.project_id)
         return project_list
 
