@@ -264,6 +264,8 @@ def cache_read_data(filename):
 
 
 class EnvNameValidator(Validator):
+    """ For userinterface input validator """
+
     def validate(self, document):
         """Validate the env name, must have 6 characters or more"""
         if len(document.text) >= 6:
@@ -273,3 +275,5 @@ class EnvNameValidator(Validator):
                 message='Name must be 6 characters or more',
                 cursor_position=len(
                     document.text))
+
+# --------------------------------------------------------------------

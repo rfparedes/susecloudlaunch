@@ -302,7 +302,7 @@ class CloudLaunchInstance:
             # No projects ever created so exit
             if not project_names:
                 sys.exit(
-                    '\033[1;32;40m No projects to destroy. Exiting')
+                    WARNING + "No projects to destroy. Exiting" + ENDC)
             else:
                 envid_select = [
                     {
