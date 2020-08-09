@@ -171,13 +171,12 @@ class AzureInstance:
             allproviderutil.done = True
             spin_thread.join()
             # cache the results
-            f = open(".azureimagecache", "wb")
-            pickle.dump(list_of_images, f)
-            f.close()
+            allproviderutil.cache_write_data(
+                ".azureimagecache", list_of_images)
             return(list_of_images)
         else:
-            list_of_images = pickle.load(
-                open(".azureimagecache", "rb"))
+            list_of_images = allproviderutil.cache_read_data(
+                ".azureimagecache")
             return list_of_images
 
     # --------------------------------------------------------------------
@@ -189,6 +188,7 @@ class AzureInstance:
         for image in list_of_images:
             image = image.lower()
             publisher, offer, sku, version = image.split(":")
+
             # images are sles-12-sp4
             if (os in 'sles-12-sp4') and ((sku in os and offer ==
                                            "sles-byos") or (sku == "12-sp4-gen2" and offer == "sles")):
@@ -209,7 +209,8 @@ class AzureInstance:
             elif (os in ['sles-sap-15'] and (sku == '15' or sku == 'gen2-15') and (offer == 'sles-sap-byos')):
                 os_images.append(image)
             # images are all others
-            elif (os in offer and sku == "gen2" and os != 'sles-15' and os != 'sles-sap-15'):
+            elif (os in offer and sku == "gen2" and os != 'sles-15'
+                  and os != 'sles-sap-15'):
                 os_images.append(image)
 
         return os_images
