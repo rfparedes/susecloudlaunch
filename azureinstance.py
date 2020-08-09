@@ -185,7 +185,10 @@ class AzureInstance:
         """This code is crap and not general enough because of the inconsistency of our marketplace offer/skus"""
         os_images = []
 
-        for image in list_of_images:
+        new_list_of_images = self.sort_images_sles_or_sap(
+            list_of_images, sles_or_sap)
+
+        for image in new_list_of_images:
             image = image.lower()
             publisher, offer, sku, version = image.split(":")
 
@@ -214,3 +217,21 @@ class AzureInstance:
                 os_images.append(image)
 
         return os_images
+
+    def sort_images_sles_or_sap(self, list_of_images, sles_or_sap):
+        """Sort images into either sles or sap"""
+        sap_images = []
+        sles_images = []
+        for image in list_of_images:
+            image = image.lower()
+            publisher, offer, sku, version = image.split(":")
+
+            if ('sles-sap' in offer):
+                sap_images.append(image)
+            else:
+                sles_images.append(image)
+
+        if sles_or_sap == 'sles':
+            return sles_images
+        else:
+            return sap_images
