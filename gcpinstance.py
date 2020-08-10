@@ -115,7 +115,7 @@ class GCPInstance:
             credentials = GoogleCredentials.get_application_default()
             service = discovery.build(
                 'compute', 'v1', credentials=credentials)
-            project = self.get_instance()
+            project = self.get_projectid()
             request = service.regions().list(project=project)
             while request is not None:
                 response = request.execute()
