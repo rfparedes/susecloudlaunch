@@ -1,6 +1,8 @@
 # susecloudlaunch
 
 # Prerequisites
+- Need local install of terraform
+
 - Need the following to build instances in AWS
 
     - AWS credentials in ~/.aws/credentials of following format:
@@ -18,7 +20,7 @@
 
 - Need the following to build instances in GCP
     - gcloud auth application-default login
-    - enabled Cloud Resource Manager API
+    - enabled Cloud Resource Manager API for project
 
 
 - The public key of logged in user will be used to login to instances

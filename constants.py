@@ -1,7 +1,7 @@
 AWS_INSTANCE_TYPES = [
     't3.micro',
     't3.small',
-    'm4.large']
+    'c5.large']
 
 # --------------------------------------------------------------------
 AZURE_INSTANCE_TYPES = [
