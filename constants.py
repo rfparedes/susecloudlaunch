@@ -7,8 +7,8 @@ AWS_INSTANCE_TYPES = [
 AZURE_INSTANCE_TYPES = [
     'B1s',
     'B1ms',
-    'B2ms']
-
+    'B2ms',
+    'D4s_v3']
 # --------------------------------------------------------------------
 GCP_INSTANCE_TYPES = [
     'e2-small',
