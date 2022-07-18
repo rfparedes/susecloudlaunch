@@ -54,7 +54,8 @@ def destroy_terraform_env(provider, envid):
     spin_thread = threading.Thread(target=spin_cursor)
     print(OKGREEN + 'Destroying ' + envid + ' ' + ENDC, end=" ")
     spin_thread.start()
-    return_code, stdout, stderr = (tf.destroy(capture_output=True))
+    return_code, stdout, stderr = (tf.destroy(
+        force=IsNotFlagged, auto_approve=True, capture_output=True))
     done = True
     spin_thread.join()
     if return_code == 1:
