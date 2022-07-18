@@ -31,7 +31,9 @@ SLES_VERSIONS = [
     'sles-12-sp5',
     'sles-15',
     'sles-15-sp1',
-    'sles-15-sp2'
+    'sles-15-sp2',
+    'sles-15-sp3',
+    'sles-15-sp4'
 ]
 
 # --------------------------------------------------------------------
@@ -43,7 +45,9 @@ SLES_SAP_VERSIONS = [
     'sles-sap-12-sp5',
     'sles-sap-15',
     'sles-sap-15-sp1',
-    'sles-sap-15-sp2'
+    'sles-sap-15-sp2',
+    'sles-sap-15-sp3',
+    'sles-sap-15-sp4'
 ]
 
 # --------------------------------------------------------------------
