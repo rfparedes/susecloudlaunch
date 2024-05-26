@@ -1,5 +1,5 @@
 AWS_INSTANCE_TYPES = [
-    't3.micro',
+    't2.micro',
     't3.small',
     'c5.large']
 
