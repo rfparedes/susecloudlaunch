@@ -33,7 +33,7 @@ resource "google_compute_firewall" "allow-tcp-from-iap" {
 
 # external ip address
 resource "google_compute_address" "static" {
-  name = "ipv4-address"
+  name = "${var.gcp_env_1}-ipv4-address"
 }
 
 # allow ssh to instance
